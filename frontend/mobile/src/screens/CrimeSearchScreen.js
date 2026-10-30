@@ -94,7 +94,7 @@ export function CrimeSearchScreen({ navigation }) {
     <ScreenWrapper scrollable edges={['top', 'bottom']} style={{ backgroundColor: colors.bgPrimary }}>
       {/* HEADER */}
       <View style={styles.topHeader}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={() => (navigation.canGoBack ? (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('MainTabs')) : navigation.navigate('MainTabs'))}>
           <ArrowLeft size={20} color={colors.textPrimary} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

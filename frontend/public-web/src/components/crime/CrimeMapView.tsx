@@ -46,8 +46,8 @@ export const CrimeMapView: React.FC<CrimeMapViewProps> = () => {
       attributionControl: true,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CARTO &copy; OpenStreetMap',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
     }).addTo(map);
 
@@ -319,7 +319,7 @@ export const CrimeMapView: React.FC<CrimeMapViewProps> = () => {
             </div>
           </div>
 
-          {weeklyReport && (
+          {weeklyReport && weeklyReport.ranked_areas && weeklyReport.ranked_areas.length > 0 ? (
             <div className="space-y-4">
               
               {/* Rank 1, 2, 3 Highlights */}
@@ -360,6 +360,11 @@ export const CrimeMapView: React.FC<CrimeMapViewProps> = () => {
                 </div>
               </div>
 
+            </div>
+          ) : (
+            <div className="py-8 text-center text-xs text-[var(--text-muted)]">
+              <p className="font-semibold text-[var(--text-primary)]">No verified incidents available</p>
+              <p className="text-[11px] mt-0.5">There are no verified crime records in the selected time window.</p>
             </div>
           )}
         </div>

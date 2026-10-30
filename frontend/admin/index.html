@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer - Safety Operations Center & Admin Command</title>
+    <title>SafeHer - Police Dispatch &amp; Admin Operations Center</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1096,6 +1096,348 @@
         .hidden {
             display: none !important;
         }
+    
+        /* --- Multi-Role Switcher & Authentication UI --- */
+        .role-selector-bar {
+            display: flex;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 1.25rem;
+        }
+
+        .role-select-btn {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 7px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .role-select-btn.active {
+            background: var(--brand-primary);
+            color: #FFFFFF;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+
+        .credential-quick-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg-surface-elevated);
+            border: 1px dashed var(--border-medium);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .credential-quick-pill:hover {
+            border-color: var(--brand-primary);
+            color: var(--brand-primary);
+            background: var(--brand-subtle);
+        }
+
+        /* --- Duty Control & Officer Header Pills --- */
+        .officer-role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+
+        .duty-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .duty-badge.on-duty {
+            background: rgba(16, 185, 129, 0.18);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .duty-badge.off-duty {
+            background: rgba(156, 163, 175, 0.15);
+            color: #9CA3AF;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+        }
+
+        .btn-duty-toggle {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .btn-duty-toggle.toggle-on {
+            background: #059669;
+            color: #FFFFFF;
+        }
+        .btn-duty-toggle.toggle-on:hover {
+            background: #047857;
+        }
+        .btn-duty-toggle.toggle-off {
+            background: #4B5563;
+            color: #FFFFFF;
+        }
+        .btn-duty-toggle.toggle-off:hover {
+            background: #374151;
+        }
+
+        /* --- Patrol Radar Map Layout & Components --- */
+        .radar-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1.25rem;
+            min-height: 640px;
+        }
+
+        @media (max-width: 1024px) {
+            .radar-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .radar-map-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .radar-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-surface-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .radar-radius-selector {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .radius-pill {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .radius-pill.active {
+            background: #2563EB;
+            color: #FFFFFF;
+            border-color: #2563EB;
+        }
+
+        .gps-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .gps-status-indicator.active {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .gps-status-indicator.unavailable {
+            background: rgba(245, 158, 11, 0.12);
+            color: #F59E0B;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .gps-notice-banner {
+            padding: 8px 12px;
+            background: rgba(245, 158, 11, 0.12);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+            font-size: 0.75rem;
+            color: #D97706;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        #patrolRadarMap {
+            width: 100%;
+            height: 100%;
+            min-height: 540px;
+            z-index: 1;
+        }
+
+        .radar-side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* --- Active Response Console Card --- */
+        .active-response-box {
+            background: var(--bg-surface);
+            border: 2px solid var(--status-emergency);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 16px rgba(225, 29, 72, 0.12);
+            position: relative;
+            animation: pulse-border 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--status-emergency); }
+            50% { border-color: rgba(225, 29, 72, 0.45); }
+        }
+
+        .active-response-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.65rem;
+        }
+
+        .milestone-stepper {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+            margin: 0.75rem 0;
+        }
+
+        .milestone-btn {
+            padding: 6px 4px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-surface-elevated);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .milestone-btn.current {
+            background: var(--brand-primary);
+            color: #FFFFFF;
+            border-color: var(--brand-primary);
+        }
+        .milestone-btn.completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* --- Alerts Feed Cards --- */
+        .radar-alert-item {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--status-emergency);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .radar-alert-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .btn-accept-alert {
+            flex: 1;
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: none;
+            background: #E11D48;
+            color: #FFFFFF;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .btn-accept-alert:hover { background: #BE123C; }
+
+        .btn-decline-alert {
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-medium);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-decline-alert:hover {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        /* --- Clean Empty State Box --- */
+        .empty-state-box {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+            background: var(--bg-surface-elevated);
+            border: 1px dashed var(--border-subtle);
+            border-radius: 10px;
+        }
+        .empty-state-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+        .empty-state-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        .empty-state-desc {
+            font-size: 0.76rem;
+            line-height: 1.4;
+        }
+
     </style>
 </head>
 <body>
@@ -1108,7 +1450,7 @@
                         SafeHer Operations
                         <span class="live-ops-pill"><span class="pulse-indicator"></span>Live CAD</span>
                     </h1>
-                    <div class="brand-subtitle">Safety Operations Center &amp; Executive Admin Command</div>
+                    <div class="brand-subtitle">Law Enforcement Dispatch &amp; Administrative Command Portal</div>
                 </div>
             </div>
 
@@ -1120,6 +1462,11 @@
                     ⚙️ API
                 </button>
                 <div id="loggedInUser" class="hidden" style="display: flex; gap: 0.65rem; align-items: center;">
+                    <!-- Police Duty Status Controls (Visible for Police Officers/Supervisors) -->
+                    <div id="policeDutyWidget" class="hidden" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span id="headerDutyBadge" class="duty-badge off-duty">OFF DUTY</span>
+                        <button id="headerDutyToggleBtn" class="btn-duty-toggle toggle-on" onclick="toggleDuty()">⚡ Go ON Duty</button>
+                    </div>
                     <div class="admin-profile-pill">
                         <span style="color: var(--status-success); font-size: 0.75rem;">●</span>
                         <span id="userEmailBadge">Admin</span>
@@ -1133,8 +1480,21 @@
         <div id="authContainer" class="auth-container">
             <!-- Login Form -->
             <div class="auth-card" id="loginForm">
-                <h2>Admin Command Access</h2>
-                <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 0.75rem;">
+                <!-- Role Selector Toggle -->
+                <div class="role-selector-bar">
+                    <button type="button" class="role-select-btn active" id="roleBtn-admin" onclick="selectLoginRole('ADMIN')">
+                        👑 Administrator
+                    </button>
+                    <button type="button" class="role-select-btn" id="roleBtn-supervisor" onclick="selectLoginRole('SUPERVISOR')">
+                        🎖️ Police Supervisor
+                    </button>
+                    <button type="button" class="role-select-btn" id="roleBtn-officer" onclick="selectLoginRole('OFFICER')">
+                        👮 Police Officer
+                    </button>
+                </div>
+
+                <h2 id="loginTitle">Admin Command Access</h2>
+                <div id="loginSubtitle" style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 0.75rem;">
                     Sign in with your master administrator credentials.
                 </div>
                 <div id="loginError" class="error-msg"></div>
@@ -1142,10 +1502,21 @@
                     <input type="text" id="adminIdInput" placeholder="Administrator ID (e.g. admin)" required autocomplete="username">
                     <input type="password" id="passwordInput" placeholder="Password (e.g. admin123)" required autocomplete="current-password">
                     <button class="btn-auth-primary" onclick="login()" id="loginBtn">Log In to Console</button>
-                    <div class="auth-link" onclick="showForm('forgotForm')">Forgot Administrative Password?</div>
+                    <div class="auth-link" id="forgotPasswordLink" onclick="showForm('forgotForm')">Forgot Administrative Password?</div>
                 </div>
-                <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-muted); text-align: center;">
-                    🔒 <strong>Strict Admin Access:</strong> Protected by cryptographic JWT role tokens verified against the backend.
+
+                <!-- One-Click Authorized Testing Credentials Helper -->
+                <div style="margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px dashed var(--border-subtle); font-size: 0.75rem; color: var(--text-muted); text-align: left;">
+                    <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;">Authorized Test Accounts (Click to Fill):</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                        <span class="credential-quick-pill" onclick="quickFillCredentials('ADMIN', 'admin', 'admin123')">👑 admin / admin123</span>
+                        <span class="credential-quick-pill" onclick="quickFillCredentials('SUPERVISOR', 'POL-101', 'PoliceSecure@2026')">🎖️ POL-101 (Supervisor)</span>
+                        <span class="credential-quick-pill" onclick="quickFillCredentials('OFFICER', 'POL-102', 'PoliceSecure@2026')">👮 POL-102 (Patrol Officer)</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; font-size: 0.72rem; color: var(--text-muted); text-align: center;">
+                    🔒 <strong>Strict RBAC Enforcement:</strong> All administrative and police actions are cryptographically authenticated via backend tokens.
                 </div>
             </div>
 
@@ -1176,10 +1547,16 @@
 
         <!-- Dashboard Content -->
         <div id="dashboardContent" class="hidden">
-            <!-- 5 Operational Navigation Tabs -->
-            <div class="tabs">
+            <!-- Operational Navigation Tabs (Filtered Dynamically by Role) -->
+            <div class="tabs" id="mainTabsContainer">
+                <button class="btn-tab" id="tab-radar" onclick="switchTab('radar')">
+                    🛰️ Patrol Radar Map
+                </button>
                 <button class="btn-tab active" id="tab-incidents" onclick="switchTab('incidents')">
-                    🚨 Emergency Incidents &amp; Live Map
+                    🚨 Incidents &amp; Live Map
+                </button>
+                <button class="btn-tab hidden" id="tab-police-alerts" onclick="switchTab('police-alerts')">
+                    ⚡ SOS Alerts &amp; Active Response
                 </button>
                 <button class="btn-tab" id="tab-police" onclick="switchTab('police')">
                     👮 Police Force Management
@@ -1192,6 +1569,9 @@
                 </button>
                 <button class="btn-tab" id="tab-users" onclick="switchTab('users')">
                     👥 Citizen Directory
+                </button>
+                <button class="btn-tab hidden" id="tab-police-history" onclick="switchTab('police-history')">
+                    📜 Incident Audit History
                 </button>
             </div>
 
@@ -1511,6 +1891,179 @@
                     </div>
                 </div>
             </div>
+
+            <!-- VIEW 6: Fixed Comprehensive Patrol Radar Map -->
+            <div id="view-radar" class="hidden">
+                <div class="radar-layout">
+                    <!-- Left: OpenStreetMap Leaflet Container -->
+                    <div class="radar-map-panel">
+                        <div class="radar-controls-bar">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>🛰️ Situational Patrol Radar</span>
+                                </div>
+                                <!-- Range Selector: 1km, 2km, 3km, 5km -->
+                                <div class="radar-radius-selector">
+                                    <span style="font-size: 0.72rem; color: var(--text-muted); margin-right: 4px;">Radius:</span>
+                                    <button class="radius-pill" onclick="setRadarRadius(1)" id="radius-1">1 km</button>
+                                    <button class="radius-pill" onclick="setRadarRadius(2)" id="radius-2">2 km</button>
+                                    <button class="radius-pill active" onclick="setRadarRadius(3)" id="radius-3">3 km</button>
+                                    <button class="radius-pill" onclick="setRadarRadius(5)" id="radius-5">5 km</button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <span id="gpsIndicator" class="gps-status-indicator unavailable">
+                                    <span>⚠️ GPS Seeking...</span>
+                                </span>
+                                <button class="btn-small" onclick="requestOfficerGeolocation()" title="Broadcast GPS Location">
+                                    📍 Center GPS
+                                </button>
+                                <button class="btn-small" onclick="fetchRadarData()" title="Refresh Patrol Radar Data">
+                                    ↻ Refresh Radar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- GPS Notification Banner if location is unavailable -->
+                        <div id="gpsNoticeBanner" class="gps-notice-banner hidden">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span>⚠️</span>
+                                <span id="gpsNoticeText">GPS location access unavailable. Please grant browser location permission to view your active patrol beacon and center radar. Coordinates are never fabricated.</span>
+                            </div>
+                            <button class="btn-small" onclick="requestOfficerGeolocation()" style="padding: 2px 8px; font-size: 0.7rem;">Grant Access</button>
+                        </div>
+
+                        <!-- Leaflet OSM Map Canvas (Strictly OpenStreetMap - Zero API keys) -->
+                        <div id="patrolRadarMap"></div>
+                    </div>
+
+                    <!-- Right: Live Radar Feed & Active Response Console -->
+                    <div class="radar-side-panel">
+                        <!-- Active Response Console (Shown when an incident is accepted / in progress) -->
+                        <div id="radarActiveResponseContainer" class="hidden">
+                            <div class="active-response-box">
+                                <div class="active-response-header">
+                                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--status-emergency); text-transform: uppercase; letter-spacing: 0.5px;">
+                                        ⚡ ACTIVE EMERGENCY DISPATCH
+                                    </span>
+                                    <span id="activeIncBadge" class="status-badge status-ACTIVE">IN PROGRESS</span>
+                                </div>
+                                <div id="activeIncVictim" style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">Civilian in Distress</div>
+                                <div id="activeIncMeta" style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 0.75rem;">
+                                    <div>📞 <span id="activeIncPhone">-</span></div>
+                                    <div>📍 <span id="activeIncLocality">Locality</span></div>
+                                    <div>🚨 Type: <span id="activeIncType">Emergency</span></div>
+                                </div>
+
+                                <div style="font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Milestone Status Progression:</div>
+                                <div class="milestone-stepper">
+                                    <button class="milestone-btn" id="step-EN_ROUTE" onclick="updateActiveIncidentStatus('EN_ROUTE')">
+                                        🚗 En Route
+                                    </button>
+                                    <button class="milestone-btn" id="step-ON_SCENE" onclick="updateActiveIncidentStatus('ON_SCENE')">
+                                        📍 On Scene
+                                    </button>
+                                    <button class="milestone-btn" id="step-RESOLVED" onclick="updateActiveIncidentStatus('RESOLVED')">
+                                        ✓ Resolved
+                                    </button>
+                                </div>
+
+                                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                                    <a id="activeIncNavBtn" href="#" target="_blank" class="btn-small" style="flex: 1; text-align: center; text-decoration: none; background: #2563EB; color: #fff; padding: 6px;">
+                                        🧭 Open in Google Maps ↗
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 1: Nearby Emergency Alerts in Range -->
+                        <div class="panel" style="padding: 1rem;">
+                            <div class="panel-header" style="margin-bottom: 0.65rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-subtle);">
+                                <div style="font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>🚨 Nearby Emergency Alerts</span>
+                                    <span id="radarAlertsCountBadge" class="badge badge-emergency" style="font-size: 0.7rem; padding: 1px 6px;">0</span>
+                                </div>
+                            </div>
+                            <div id="radarAlertsList" style="display: flex; flex-direction: column; gap: 0.65rem; max-height: 280px; overflow-y: auto;">
+                                <div class="empty-state-box" style="padding: 1.5rem 0.5rem;">
+                                    <div class="empty-state-icon">🛡️</div>
+                                    <div class="empty-state-title">No Emergency Alerts</div>
+                                    <div class="empty-state-desc">Your patrol radius is calm. Incoming SOS alerts will appear here in real time.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Other Active Patrol Units in Sector -->
+                        <div class="panel" style="padding: 1rem;">
+                            <div class="panel-header" style="margin-bottom: 0.65rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-subtle);">
+                                <div style="font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>🚔 Active Patrol Units in Sector</span>
+                                    <span id="radarUnitsCountBadge" class="badge badge-info" style="font-size: 0.7rem; padding: 1px 6px;">0</span>
+                                </div>
+                            </div>
+                            <div id="radarUnitsList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 240px; overflow-y: auto;">
+                                <div class="empty-state-box" style="padding: 1.5rem 0.5rem;">
+                                    <div class="empty-state-icon">👮</div>
+                                    <div class="empty-state-title">No Other Units Active</div>
+                                    <div class="empty-state-desc">You are the primary unit on duty in this sector.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 7: Dedicated Police Alerts & Active Response Queue -->
+            <div id="view-police-alerts" class="hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>⚡ Emergency Distress Queue &amp; Dispatch Console</h2>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Real-time panic signals, location broadcasts, and emergency dispatch actions.</div>
+                        </div>
+                        <button class="btn-small" onclick="fetchRadarData()">↻ Refresh Alerts</button>
+                    </div>
+                    <div id="dedicatedAlertsList" style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 1rem;">
+                        <div class="empty-state-box">
+                            <div class="empty-state-icon">🛡️</div>
+                            <div class="empty-state-title">No Active SOS Alerts</div>
+                            <div class="empty-state-desc">There are currently no unresolved emergency dispatches in the system.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 8: Police Incident History & Audit -->
+            <div id="view-police-history" class="hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>📜 Incident Resolution Audit History</h2>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Permanent log of resolved emergency responses, officer dispatches, and timestamps.</div>
+                        </div>
+                        <button class="btn-small" onclick="fetchPoliceHistory()">↻ Refresh History</button>
+                    </div>
+                    <div class="data-table-wrap" style="margin-top: 1rem;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Incident #</th>
+                                    <th>Type</th>
+                                    <th>Victim</th>
+                                    <th>Phone</th>
+                                    <th>Locality</th>
+                                    <th>Status</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="policeHistoryTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading incident history...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Commission Police Officer Modal -->
@@ -1789,21 +2342,38 @@
 
         const API_URL = getApiUrl();
         
+        // --- Multi-Role Global State ---
+        let authRole = 'ADMIN'; // 'ADMIN' | 'SUPERVISOR' | 'OFFICER'
+        let selectedLoginRole = 'ADMIN';
+        let policeOfficer = null;
+        let currentAdmin = null;
+
         let map;
         let markers = [];
+        let radarMap = null;
+        let radarRadiusKm = 3;
+        let radarCircle = null;
+        let officerMarker = null;
+        let otherUnitMarkers = [];
+        let radarAlertMarkers = [];
+        let officerLat = null;
+        let officerLng = null;
+        let activeIncidentData = null;
+        let activeIncidentId = null;
+        let radarInterval = null;
+
         let allIncidents = [];
         let allOfficers = [];
         let allCrimeReports = [];
         let allAdvisories = [];
         let allPatrolRecs = [];
         let currentResetToken = null;
-        let currentAdmin = null;
         let pendingResolveIncidentId = null;
         let activeModalIncidentId = null;
         let pendingApprovePatrolId = null;
         let toastTimeout = null;
 
-        // Routing logic based on URL params
+        // Routing logic based on URL params & multi-role credentials
         window.onload = () => {
             initTheme();
             const params = new URLSearchParams(window.location.search);
@@ -1812,12 +2382,64 @@
                 currentResetToken = resetToken;
                 showForm('resetForm');
             } else {
-                const token = localStorage.getItem('adminToken');
-                if (token) {
-                    loadDashboard(token);
+                const adminToken = localStorage.getItem('adminToken');
+                const policeToken = localStorage.getItem('policeToken');
+                const savedRole = localStorage.getItem('safeher_role');
+
+                if (policeToken && (savedRole === 'SUPERVISOR' || savedRole === 'OFFICER')) {
+                    loadDashboard(policeToken, savedRole);
+                } else if (adminToken) {
+                    loadDashboard(adminToken, 'ADMIN');
                 }
             }
         };
+
+        // --- Role Selection on Login Screen ---
+        function selectLoginRole(role) {
+            selectedLoginRole = role;
+            ['admin', 'supervisor', 'officer'].forEach(r => {
+                const btn = document.getElementById(`roleBtn-${r}`);
+                if (btn) btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`roleBtn-${role.toLowerCase()}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const title = document.getElementById('loginTitle');
+            const subtitle = document.getElementById('loginSubtitle');
+            const adminInput = document.getElementById('adminIdInput');
+            const passInput = document.getElementById('passwordInput');
+            const forgotLink = document.getElementById('forgotPasswordLink');
+            const err = document.getElementById('loginError');
+            if (err) err.innerText = '';
+
+            if (role === 'ADMIN') {
+                if (title) title.innerText = "Admin Command Access";
+                if (subtitle) subtitle.innerText = "Sign in with your master administrator credentials.";
+                if (adminInput) adminInput.placeholder = "Administrator ID (e.g. admin)";
+                if (passInput) passInput.placeholder = "Password (e.g. admin123)";
+                if (forgotLink) forgotLink.classList.remove('hidden');
+            } else if (role === 'SUPERVISOR') {
+                if (title) title.innerText = "Police Supervisor Access";
+                if (subtitle) subtitle.innerText = "Sign in with your supervisory badge ID or official police email.";
+                if (adminInput) adminInput.placeholder = "Supervisor Badge ID (e.g. POL-101)";
+                if (passInput) passInput.placeholder = "Department Secure Password";
+                if (forgotLink) forgotLink.classList.add('hidden');
+            } else {
+                if (title) title.innerText = "Police Patrol Officer Access";
+                if (subtitle) subtitle.innerText = "Sign in with your officer badge ID or official police email.";
+                if (adminInput) adminInput.placeholder = "Officer Badge ID (e.g. POL-102)";
+                if (passInput) passInput.placeholder = "Department Secure Password";
+                if (forgotLink) forgotLink.classList.add('hidden');
+            }
+        }
+
+        function quickFillCredentials(role, id, pass) {
+            selectLoginRole(role);
+            const idInput = document.getElementById('adminIdInput');
+            const passInput = document.getElementById('passwordInput');
+            if (idInput) idInput.value = id;
+            if (passInput) passInput.value = pass;
+        }
 
         // --- Theme System ---
         function initTheme() {
@@ -1878,15 +2500,15 @@
             document.querySelectorAll('.success-msg').forEach(el => el.innerText = '');
         }
 
-        // --- Auth Operations ---
+        // --- Unified Multi-Role Auth Operations ---
         async function login() {
-            const adminId = document.getElementById('adminIdInput').value.trim();
+            const idVal = document.getElementById('adminIdInput').value.trim();
             const password = document.getElementById('passwordInput').value;
             const btn = document.getElementById('loginBtn');
             const err = document.getElementById('loginError');
             
-            if (!adminId || !password) {
-                err.innerText = "Please provide both Admin ID and password.";
+            if (!idVal || !password) {
+                err.innerText = "Please provide both ID/Badge Number and password.";
                 return;
             }
             
@@ -1895,19 +2517,43 @@
             err.innerText = "";
             
             try {
-                const res = await fetch(`${API_URL}/admin/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ admin_id: adminId, password: password })
-                });
-                
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.detail || "Authentication failed. Ensure valid Administrator credentials.");
+                if (selectedLoginRole === 'ADMIN') {
+                    // Authenticate Master Administrator
+                    const res = await fetch(`${API_URL}/admin/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ admin_id: idVal, password: password })
+                    });
+                    
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.detail || "Administrator authentication failed. Verify admin credentials.");
+                    }
+                    
+                    localStorage.setItem('adminToken', data.access_token);
+                    localStorage.setItem('safeher_role', 'ADMIN');
+                    localStorage.removeItem('policeToken');
+                    loadDashboard(data.access_token, 'ADMIN');
+                } else {
+                    // Authenticate Police Officer / Supervisor
+                    const res = await fetch(`${API_URL}/police/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ badge_number: idVal, password: password })
+                    });
+                    
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.detail || "Police authentication failed. Verify official badge and password.");
+                    }
+                    
+                    const officerRole = (data.officer && data.officer.role) ? data.officer.role.toUpperCase() : 'OFFICER';
+                    localStorage.setItem('policeToken', data.access_token);
+                    localStorage.setItem('safeher_role', officerRole);
+                    localStorage.removeItem('adminToken');
+                    policeOfficer = data.officer;
+                    loadDashboard(data.access_token, officerRole);
                 }
-                
-                localStorage.setItem('adminToken', data.access_token);
-                loadDashboard(data.access_token);
             } catch (error) {
                 err.innerText = error.message;
             } finally {
@@ -1918,7 +2564,15 @@
 
         function logout() {
             localStorage.removeItem('adminToken');
+            localStorage.removeItem('policeToken');
+            localStorage.removeItem('safeher_role');
             currentAdmin = null;
+            policeOfficer = null;
+            authRole = 'ADMIN';
+            if (radarInterval) {
+                clearInterval(radarInterval);
+                radarInterval = null;
+            }
             document.getElementById('dashboardContent').classList.add('hidden');
             document.getElementById('loggedInUser').classList.add('hidden');
             document.getElementById('authContainer').classList.remove('hidden');
@@ -1989,9 +2643,10 @@
             }
         }
 
-        // --- Tabs Navigation ---
+        // --- Dynamic Multi-Role Tabs Navigation ---
         function switchTab(tab) {
-            ['incidents', 'police', 'crime', 'safety', 'users'].forEach(t => {
+            const allTabs = ['radar', 'incidents', 'police-alerts', 'police', 'crime', 'safety', 'users', 'police-history'];
+            allTabs.forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 const tabBtn = document.getElementById(`tab-${t}`);
                 if (view) view.classList.add('hidden');
@@ -2003,8 +2658,16 @@
             if (activeView) activeView.classList.remove('hidden');
             if (activeBtn) activeBtn.classList.add('active');
             
-            if (tab === 'incidents') {
+            if (tab === 'radar') {
+                initRadarMap();
+                requestOfficerGeolocation();
+                fetchRadarData();
+            } else if (tab === 'incidents') {
+                initMap();
                 if (map) setTimeout(() => map.invalidateSize(), 150);
+                fetchIncidents();
+            } else if (tab === 'police-alerts') {
+                fetchRadarData();
             } else if (tab === 'police') {
                 fetchOfficers();
             } else if (tab === 'crime') {
@@ -2014,33 +2677,695 @@
                 fetchPatrolRecommendations();
             } else if (tab === 'users') {
                 fetchUsers();
+            } else if (tab === 'police-history') {
+                fetchPoliceHistory();
             }
         }
 
-        // --- Dashboard Initialization ---
-        async function loadDashboard(token) {
+        // --- Role-Based Dashboard Initialization ---
+        async function loadDashboard(token, role = 'ADMIN') {
+            authRole = role;
             document.getElementById('authContainer').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
             document.getElementById('loggedInUser').classList.remove('hidden');
 
+            const dutyWidget = document.getElementById('policeDutyWidget');
+            const userBadge = document.getElementById('userEmailBadge');
+            const statsGrid = document.querySelector('.stats-overview-grid');
+
+            if (role === 'ADMIN') {
+                // Administrator Setup
+                if (dutyWidget) dutyWidget.classList.add('hidden');
+                if (statsGrid) statsGrid.classList.remove('hidden');
+
+                // Tab Visibility for Admin
+                document.getElementById('tab-radar')?.classList.remove('hidden');
+                document.getElementById('tab-incidents')?.classList.remove('hidden');
+                document.getElementById('tab-police')?.classList.remove('hidden');
+                document.getElementById('tab-crime')?.classList.remove('hidden');
+                document.getElementById('tab-safety')?.classList.remove('hidden');
+                document.getElementById('tab-users')?.classList.remove('hidden');
+                document.getElementById('tab-police-alerts')?.classList.add('hidden');
+                document.getElementById('tab-police-history')?.classList.add('hidden');
+
+                try {
+                    const adminRes = await fetch(`${API_URL}/admin/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (adminRes.ok) {
+                        currentAdmin = await adminRes.json();
+                        userBadge.innerText = `👑 Admin (${currentAdmin.email || currentAdmin.admin_id})`;
+                    } else if (adminRes.status === 401 || adminRes.status === 403) {
+                        logout();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Admin profile fetch notice:", e);
+                }
+
+                initMap();
+                loadComprehensiveStats(token);
+                switchTab('incidents');
+            } else {
+                // Police Officer / Supervisor Setup
+                if (dutyWidget) dutyWidget.classList.remove('hidden');
+                if (statsGrid) statsGrid.classList.add('hidden'); // Focused tactical view for officers
+
+                // Tab Visibility for Police
+                document.getElementById('tab-radar')?.classList.remove('hidden');
+                document.getElementById('tab-police-alerts')?.classList.remove('hidden');
+                document.getElementById('tab-safety')?.classList.remove('hidden');
+                document.getElementById('tab-police-history')?.classList.remove('hidden');
+
+                if (role === 'SUPERVISOR') {
+                    document.getElementById('tab-police')?.classList.remove('hidden'); // Station force oversight
+                } else {
+                    document.getElementById('tab-police')?.classList.add('hidden');
+                }
+
+                // Hide civilian directory & verification tabs from patrol officers
+                document.getElementById('tab-incidents')?.classList.add('hidden');
+                document.getElementById('tab-crime')?.classList.add('hidden');
+                document.getElementById('tab-users')?.classList.add('hidden');
+
+                try {
+                    const profRes = await fetch(`${API_URL}/police/officer/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (profRes.ok) {
+                        policeOfficer = await profRes.json();
+                        const prefix = role === 'SUPERVISOR' ? '🎖️ Supervisor' : '👮 Officer';
+                        userBadge.innerText = `${prefix} ${policeOfficer.name} (${policeOfficer.badge_number})`;
+                    } else if (profRes.status === 401 || profRes.status === 403) {
+                        logout();
+                        return;
+                    }
+
+                    // Check duty status
+                    const dutyRes = await fetch(`${API_URL}/police/duty/status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (dutyRes.ok) {
+                        const dutyData = await dutyRes.json();
+                        updateDutyDisplay(dutyData.is_on_duty, dutyData.current_patrol_zone);
+                        if (policeOfficer) policeOfficer.is_on_duty = dutyData.is_on_duty;
+                    }
+                } catch (e) {
+                    console.warn("Police profile fetch notice:", e);
+                }
+
+                switchTab('radar');
+                if (radarInterval) clearInterval(radarInterval);
+                radarInterval = setInterval(fetchRadarData, 12000);
+            }
+        }
+
+        // --- Duty Status Control ---
+        function updateDutyDisplay(isOnDuty, zone) {
+            const badge = document.getElementById('headerDutyBadge');
+            const btn = document.getElementById('headerDutyToggleBtn');
+            if (badge) {
+                if (isOnDuty) {
+                    badge.className = 'duty-badge on-duty';
+                    badge.innerText = `● ON DUTY (${zone || 'Indiranagar'})`;
+                } else {
+                    badge.className = 'duty-badge off-duty';
+                    badge.innerText = 'OFF DUTY';
+                }
+            }
+            if (btn) {
+                if (isOnDuty) {
+                    btn.className = 'btn-duty-toggle toggle-off';
+                    btn.innerText = 'Go OFF Duty';
+                } else {
+                    btn.className = 'btn-duty-toggle toggle-on';
+                    btn.innerText = '⚡ Go ON Duty';
+                }
+            }
+        }
+
+        async function toggleDuty() {
+            const token = localStorage.getItem('policeToken');
+            if (!token) return;
+            const currentDuty = policeOfficer ? policeOfficer.is_on_duty : false;
+            const newDuty = !currentDuty;
+            const targetZone = (policeOfficer && policeOfficer.assigned_zone) || 'Indiranagar';
+
             try {
-                const adminRes = await fetch(`${API_URL}/admin/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const res = await fetch(`${API_URL}/police/duty/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ is_on_duty: newDuty, patrol_zone: targetZone })
                 });
-                if (adminRes.ok) {
-                    currentAdmin = await adminRes.json();
-                    document.getElementById('userEmailBadge').innerText = currentAdmin.email || currentAdmin.admin_id;
-                } else if (adminRes.status === 401 || adminRes.status === 403) {
-                    logout();
-                    return;
+                if (res.ok) {
+                    const data = await res.json();
+                    if (policeOfficer) policeOfficer.is_on_duty = data.is_on_duty;
+                    updateDutyDisplay(data.is_on_duty, data.current_patrol_zone);
+                    showToast(data.is_on_duty ? "Status updated: ON DUTY" : "Status updated: OFF DUTY", "info");
+                    fetchRadarData();
+                } else {
+                    throw new Error("Failed to toggle duty status");
                 }
             } catch (e) {
-                console.warn("Admin profile fetch notice:", e);
+                showToast(e.message, "emergency");
+            }
+        }
+
+        // =====================================================================
+        // FEATURE: PATROL RADAR MAP (OpenStreetMap - ZERO API KEY REQUIRED)
+        // =====================================================================
+        function initRadarMap() {
+            if (radarMap) {
+                setTimeout(() => radarMap.invalidateSize(), 150);
+                return;
+            }
+            const mapContainer = document.getElementById('patrolRadarMap');
+            if (!mapContainer) return;
+
+            radarMap = L.map('patrolRadarMap', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([12.9716, 77.5946], 13); // Centered on Bangalore default before GPS
+
+            // Official OpenStreetMap Tiles (Strictly Free, No Carto Key, Attributed)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(radarMap);
+        }
+
+        function setRadarRadius(km) {
+            radarRadiusKm = km;
+            [1, 2, 3, 5].forEach(r => {
+                const btn = document.getElementById(`radius-${r}`);
+                if (btn) {
+                    if (r === km) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+
+            if (radarCircle && officerLat && officerLng) {
+                radarCircle.setRadius(radarRadiusKm * 1000);
+            }
+        }
+
+        function showGpsUnavailable(msg) {
+            const banner = document.getElementById('gpsNoticeBanner');
+            const text = document.getElementById('gpsNoticeText');
+            if (banner) banner.classList.remove('hidden');
+            if (text && msg) text.innerText = msg;
+        }
+
+        function hideGpsUnavailable() {
+            const banner = document.getElementById('gpsNoticeBanner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        function updateGpsIndicator(active, text) {
+            const ind = document.getElementById('gpsIndicator');
+            if (ind) {
+                if (active) {
+                    ind.className = 'gps-status-indicator active';
+                    ind.innerText = text;
+                } else {
+                    ind.className = 'gps-status-indicator unavailable';
+                    ind.innerText = text;
+                }
+            }
+        }
+
+        function requestOfficerGeolocation() {
+            if (!navigator.geolocation) {
+                showGpsUnavailable("Geolocation is not supported by your browser.");
+                updateGpsIndicator(false, "⚠️ GPS Not Supported");
+                return;
             }
 
-            initMap();
-            loadComprehensiveStats(token);
-            fetchIncidents(false, token);
+            updateGpsIndicator(false, "📍 Acquiring GPS Signal...");
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    officerLat = pos.coords.latitude;
+                    officerLng = pos.coords.longitude;
+                    hideGpsUnavailable();
+                    updateGpsIndicator(true, `● GPS Active: ${officerLat.toFixed(4)}, ${officerLng.toFixed(4)}`);
+
+                    if (radarMap) {
+                        radarMap.setView([officerLat, officerLng], 14);
+                        updateOfficerRadarMarker();
+                    }
+
+                    // Transmit live GPS coordinates to backend
+                    const token = localStorage.getItem('policeToken');
+                    if (token) {
+                        try {
+                            await fetch(`${API_URL}/police/patrol/location`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    latitude: officerLat,
+                                    longitude: officerLng,
+                                    speed_kmh: pos.coords.speed ? (pos.coords.speed * 3.6) : 0,
+                                    heading_degrees: pos.coords.heading || 0
+                                })
+                            });
+                        } catch (e) {
+                            console.warn("GPS broadcast transmission notice:", e);
+                        }
+                    }
+
+                    fetchRadarData();
+                },
+                (err) => {
+                    console.warn("GPS Location access unavailable:", err);
+                    showGpsUnavailable("GPS location access not granted. Please allow browser location access to broadcast your active patrol beacon and center the radar map. SafeHer strictly avoids inventing synthetic coordinates.");
+                    updateGpsIndicator(false, "⚠️ Location Unavailable");
+                    // NEVER invent coordinates or show a fake star!
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+            );
+        }
+
+        function updateOfficerRadarMarker() {
+            if (!radarMap || !officerLat || !officerLng) return;
+
+            // Remove existing officer marker and circle
+            if (officerMarker) radarMap.removeLayer(officerMarker);
+            if (radarCircle) radarMap.removeLayer(radarCircle);
+
+            // Translucent coverage radius circle
+            radarCircle = L.circle([officerLat, officerLng], {
+                radius: radarRadiusKm * 1000,
+                color: '#2563EB',
+                fillColor: '#3B82F6',
+                fillOpacity: 0.12,
+                weight: 1.5,
+                dashArray: '4, 4'
+            }).addTo(radarMap);
+
+            // Officer Beacon Marker (Distinct Blue)
+            const officerIcon = L.divIcon({
+                className: 'custom-officer-beacon',
+                html: `
+                    <div style="display: flex; flex-direction: column; align-items: center; pointer-events: auto;">
+                        <div style="background: #1D4ED8; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid #FFFFFF;">
+                            You (${(policeOfficer && policeOfficer.badge_number) || 'Officer'})
+                        </div>
+                        <div style="width: 14px; height: 14px; background: #2563EB; border: 2.5px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 8px #2563EB; margin-top: 2px;"></div>
+                    </div>
+                `,
+                iconSize: [80, 40],
+                iconAnchor: [40, 36]
+            });
+
+            officerMarker = L.marker([officerLat, officerLng], { icon: officerIcon }).addTo(radarMap);
+            officerMarker.bindPopup(`
+                <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
+                    <strong>Your Patrol Beacon</strong><br>
+                    Badge: <b>${(policeOfficer && policeOfficer.badge_number) || 'N/A'}</b><br>
+                    Officer: ${(policeOfficer && policeOfficer.name) || 'Patrol Unit'}<br>
+                    Zone: ${(policeOfficer && policeOfficer.assigned_zone) || 'General'}<br>
+                    Coverage Radius: <b>${radarRadiusKm} km</b>
+                </div>
+            `);
+        }
+
+        async function fetchRadarData() {
+            const token = localStorage.getItem('policeToken') || localStorage.getItem('adminToken');
+            if (!token) return;
+
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            // 1. Fetch other Active Patrol Units
+            try {
+                const unitsRes = await fetch(`${API_URL}/police/patrol/active-units`, { headers });
+                if (unitsRes.ok) {
+                    const units = await unitsRes.json();
+                    renderRadarPatrolUnits(units);
+                }
+            } catch (e) {
+                console.warn("Active units fetch notice:", e);
+            }
+
+            // 2. Fetch Incoming SOS Alerts
+            try {
+                const alertsRes = await fetch(`${API_URL}/police/alerts`, { headers });
+                if (alertsRes.ok) {
+                    const alerts = await alertsRes.json();
+                    renderRadarAlerts(alerts);
+                }
+            } catch (e) {
+                console.warn("Radar alerts fetch notice:", e);
+            }
+
+            // 3. Fetch Active Assigned Incident
+            try {
+                const actRes = await fetch(`${API_URL}/police/incidents/active`, { headers });
+                if (actRes.ok) {
+                    const actData = await actRes.json();
+                    renderActiveResponseConsole(actData);
+                } else {
+                    renderActiveResponseConsole(null);
+                }
+            } catch (e) {
+                renderActiveResponseConsole(null);
+            }
+        }
+
+        function renderRadarPatrolUnits(units) {
+            // Remove existing markers
+            otherUnitMarkers.forEach(m => { if (radarMap) radarMap.removeLayer(m); });
+            otherUnitMarkers = [];
+
+            // Filter out self so we don't display duplicate pins
+            const otherUnits = units.filter(u => !u.is_self && u.latitude && u.longitude);
+            const countBadge = document.getElementById('radarUnitsCountBadge');
+            if (countBadge) countBadge.innerText = otherUnits.length;
+
+            const listContainer = document.getElementById('radarUnitsList');
+            if (listContainer) {
+                if (otherUnits.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="empty-state-box" style="padding: 1.5rem 0.5rem;">
+                            <div class="empty-state-icon">👮</div>
+                            <div class="empty-state-title">No Other Units Active</div>
+                            <div class="empty-state-desc">You are currently the primary unit broadcasting patrol presence in this sector.</div>
+                        </div>
+                    `;
+                } else {
+                    listContainer.innerHTML = otherUnits.map(u => `
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.65rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.8rem; color: #0284C7;">🚔 ${escapeHtml(u.name)}</div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(u.badge_number)} • ${escapeHtml(u.patrol_zone || 'Patrol')}</div>
+                            </div>
+                            <button class="btn-small" onclick="focusRadarCoordinates(${u.latitude}, ${u.longitude})" style="font-size: 0.7rem; padding: 2px 6px;">
+                                Locate
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Add Cyan markers to radar map for other units
+            if (radarMap) {
+                otherUnits.forEach(u => {
+                    const unitIcon = L.divIcon({
+                        className: 'custom-unit-marker',
+                        html: `
+                            <div style="display: flex; flex-direction: column; align-items: center;">
+                                <div style="background: #0284C7; color: #FFFFFF; font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; border: 1px solid #FFFFFF;">
+                                    ${escapeHtml(u.badge_number)}
+                                </div>
+                                <div style="width: 12px; height: 12px; background: #38BDF8; border: 2px solid #FFFFFF; border-radius: 50%;"></div>
+                            </div>
+                        `,
+                        iconSize: [60, 30],
+                        iconAnchor: [30, 26]
+                    });
+
+                    const m = L.marker([u.latitude, u.longitude], { icon: unitIcon }).addTo(radarMap);
+                    m.bindPopup(`
+                        <div style="font-family: sans-serif; font-size: 12px;">
+                            <strong>🚔 Patrol Unit: ${escapeHtml(u.badge_number)}</strong><br>
+                            Officer: ${escapeHtml(u.name)} (${escapeHtml(u.rank)})<br>
+                            Zone: ${escapeHtml(u.patrol_zone || 'General')}<br>
+                            <span style="color: var(--text-muted); font-size: 11px;">Active in sector</span>
+                        </div>
+                    `);
+                    otherUnitMarkers.push(m);
+                });
+            }
+        }
+
+        function renderRadarAlerts(alerts) {
+            // Remove existing alert markers
+            radarAlertMarkers.forEach(m => { if (radarMap) radarMap.removeLayer(m); });
+            radarAlertMarkers = [];
+
+            const countBadge = document.getElementById('radarAlertsCountBadge');
+            if (countBadge) countBadge.innerText = alerts.length;
+
+            const listContainer = document.getElementById('radarAlertsList');
+            const dedicatedContainer = document.getElementById('dedicatedAlertsList');
+
+            if (alerts.length === 0) {
+                const emptyHtml = `
+                    <div class="empty-state-box" style="padding: 1.5rem 0.5rem;">
+                        <div class="empty-state-icon">🛡️</div>
+                        <div class="empty-state-title">No Emergency Alerts</div>
+                        <div class="empty-state-desc">Your patrol radius is calm. Incoming SOS alerts will appear here in real time.</div>
+                    </div>
+                `;
+                if (listContainer) listContainer.innerHTML = emptyHtml;
+                if (dedicatedContainer) dedicatedContainer.innerHTML = emptyHtml;
+            } else {
+                const itemsHtml = alerts.map(a => `
+                    <div class="radar-alert-item" id="alert-card-${a.id}">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 700; font-size: 0.82rem; color: var(--status-emergency);">🚨 ${escapeHtml(a.emergency_type || 'SOS Emergency')}</span>
+                            <span style="font-size: 0.72rem; color: var(--text-muted);">${formatDate(a.timestamp)}</span>
+                        </div>
+                        <div style="font-weight: 600; font-size: 0.88rem;">${escapeHtml(a.victim_name || 'Civilian in Distress')}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">
+                            <span>📞 ${escapeHtml(a.victim_phone || 'N/A')}</span> • 
+                            <span>📍 ${escapeHtml(a.locality || 'Coordinates Available')}</span>
+                        </div>
+                        <div class="radar-alert-actions">
+                            <button class="btn-accept-alert" onclick="acceptAlert(${a.incident_id || a.id})">
+                                ✓ Accept Dispatch
+                            </button>
+                            <button class="btn-decline-alert" onclick="declineAlert(${a.incident_id || a.id})">
+                                Decline
+                            </button>
+                            ${a.latitude && a.longitude ? `
+                                <button class="btn-small" onclick="focusRadarCoordinates(${a.latitude}, ${a.longitude})" style="padding: 4px 6px;" title="View on Radar">
+                                    📍 Map
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                if (listContainer) listContainer.innerHTML = itemsHtml;
+                if (dedicatedContainer) dedicatedContainer.innerHTML = itemsHtml;
+            }
+
+            // Plot Red Pulsing Markers on Radar Map
+            if (radarMap) {
+                alerts.forEach(a => {
+                    if (a.latitude && a.longitude) {
+                        const alertIcon = L.divIcon({
+                            className: 'custom-sos-marker',
+                            html: `
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <div style="background: #E11D48; color: #FFFFFF; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 3px; border: 1px solid #FFFFFF; animation: pulse 1.5s infinite;">
+                                        SOS
+                                    </div>
+                                    <div style="width: 14px; height: 14px; background: #F43F5E; border: 2.5px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 10px #E11D48;"></div>
+                                </div>
+                            `,
+                            iconSize: [50, 30],
+                            iconAnchor: [25, 26]
+                        });
+
+                        const m = L.marker([a.latitude, a.longitude], { icon: alertIcon }).addTo(radarMap);
+                        m.bindPopup(`
+                            <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
+                                <strong style="color: #E11D48;">🚨 EMERGENCY SOS: ${escapeHtml(a.emergency_type || 'SOS')}</strong><br>
+                                Victim: <b>${escapeHtml(a.victim_name || 'Civilian')}</b><br>
+                                Phone: ${escapeHtml(a.victim_phone || 'N/A')}<br>
+                                Locality: ${escapeHtml(a.locality || 'GPS Location')}<br>
+                                <div style="margin-top: 6px;">
+                                    <button class="btn-accept-alert" onclick="acceptAlert(${a.incident_id || a.id})" style="width: 100%; padding: 4px 8px;">
+                                        Accept Dispatch
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+                        radarAlertMarkers.push(m);
+                    }
+                });
+            }
+        }
+
+        function focusRadarCoordinates(lat, lng) {
+            if (radarMap && lat && lng) {
+                radarMap.setView([lat, lng], 16);
+            }
+        }
+
+        function renderActiveResponseConsole(activeData) {
+            const container = document.getElementById('radarActiveResponseContainer');
+            if (!container) return;
+
+            if (!activeData) {
+                container.classList.add('hidden');
+                activeIncidentId = null;
+                return;
+            }
+
+            container.classList.remove('hidden');
+            activeIncidentId = activeData.id || activeData.incident_id;
+
+            document.getElementById('activeIncVictim').innerText = activeData.user_name || activeData.victim_name || 'Civilian in Distress';
+            document.getElementById('activeIncPhone').innerText = activeData.user_phone || activeData.victim_phone || 'No phone recorded';
+            document.getElementById('activeIncLocality').innerText = activeData.locality || activeData.city || 'GPS Location';
+            document.getElementById('activeIncType').innerText = activeData.type || activeData.emergency_type || 'SOS Emergency';
+
+            // Status Badge
+            const status = (activeData.status || 'EN_ROUTE').toUpperCase();
+            const badge = document.getElementById('activeIncBadge');
+            if (badge) badge.innerText = status;
+
+            // Milestones highlight
+            ['EN_ROUTE', 'ON_SCENE', 'RESOLVED'].forEach(step => {
+                const btn = document.getElementById(`step-${step}`);
+                if (btn) {
+                    btn.classList.remove('current', 'completed');
+                    if (step === status) btn.classList.add('current');
+                }
+            });
+
+            // Navigation Button
+            const navBtn = document.getElementById('activeIncNavBtn');
+            let lat = activeData.latitude, lng = activeData.longitude;
+            if (activeData.locations && activeData.locations.length > 0) {
+                lat = activeData.locations[activeData.locations.length - 1].latitude;
+                lng = activeData.locations[activeData.locations.length - 1].longitude;
+            }
+            if (navBtn && lat && lng) {
+                navBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            }
+        }
+
+        async function acceptAlert(incidentId) {
+            const token = localStorage.getItem('policeToken');
+            if (!token) {
+                showToast("Police authentication required to accept dispatch", "emergency");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/police/alerts/${incidentId}/accept`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    showToast(`Emergency dispatch accepted! You are now assigned to Incident #${incidentId}`, "success");
+                    await fetchRadarData();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || "Failed to accept dispatch");
+                }
+            } catch (e) {
+                showToast(e.message, "emergency");
+            }
+        }
+
+        async function declineAlert(incidentId) {
+            const token = localStorage.getItem('policeToken');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${API_URL}/police/alerts/${incidentId}/decline`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    showToast(`Alert #${incidentId} declined. Returning dispatch to queue.`, "info");
+                    await fetchRadarData();
+                }
+            } catch (e) {
+                showToast("Could not decline dispatch", "warning");
+            }
+        }
+
+        async function updateActiveIncidentStatus(status) {
+            if (!activeIncidentId) return;
+            const token = localStorage.getItem('policeToken');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${API_URL}/police/incidents/${activeIncidentId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: status })
+                });
+
+                if (res.ok) {
+                    showToast(`Milestone recorded: Status updated to ${status}`, "success");
+                    if (status === 'RESOLVED') {
+                        renderActiveResponseConsole(null);
+                        await fetchRadarData();
+                        await fetchPoliceHistory();
+                    } else {
+                        await fetchRadarData();
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || "Failed to update incident milestone");
+                }
+            } catch (e) {
+                showToast(e.message, "emergency");
+            }
+        }
+
+        // =====================================================================
+        // FEATURE: POLICE INCIDENT HISTORY & AUDIT LOG
+        // =====================================================================
+        async function fetchPoliceHistory() {
+            const token = localStorage.getItem('policeToken') || localStorage.getItem('adminToken');
+            const tbody = document.getElementById('policeHistoryTableBody');
+            if (!tbody || !token) return;
+
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading incident history...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_URL}/police/incidents/history`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Could not load police incident history");
+
+                const history = await res.json();
+                if (history.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2.5rem 1rem;">
+                                <div class="empty-state-box" style="border: none; background: transparent;">
+                                    <div class="empty-state-icon">📜</div>
+                                    <div class="empty-state-title">No Incident History Recorded</div>
+                                    <div class="empty-state-desc">All past resolved emergency responses and police dispatches will be archived here.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = history.map(h => `
+                    <tr>
+                        <td style="font-weight: 600; font-family: monospace;">#INC-${h.id}</td>
+                        <td>${escapeHtml(h.type || 'SOS Emergency')}</td>
+                        <td>${escapeHtml(h.user_name || 'Civilian')}</td>
+                        <td>${escapeHtml(h.user_phone || 'N/A')}</td>
+                        <td>${escapeHtml(h.locality || 'Sector Patrol')}</td>
+                        <td><span class="status-badge status-${(h.status || 'RESOLVED').toUpperCase()}">${escapeHtml(h.status || 'RESOLVED')}</span></td>
+                        <td>${formatDate(h.end_time || h.start_time)}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--status-emergency);">Failed to load history: ${escapeHtml(e.message)}</td></tr>`;
+            }
         }
 
         async function loadComprehensiveStats(token = localStorage.getItem('adminToken')) {

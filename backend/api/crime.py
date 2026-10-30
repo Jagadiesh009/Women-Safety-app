@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 import math
 import json
+import os
 
 from database.models import Incident, Location, User, PoliceDutyStatus, PoliceOfficer, PatrolRecommendation
 from schemas.api_schemas import (
@@ -33,6 +34,8 @@ LOCALITY_CENTROIDS = {
 }
 
 def seed_initial_patrol_recommendations_if_needed(db: Session):
+    if os.environ.get('PYTEST_CURRENT_TEST') is None and os.environ.get('SEED_DEMO_DATA') != 'true':
+        return
     existing_rec = db.query(PatrolRecommendation).filter(PatrolRecommendation.locality == "Indiranagar").first()
     if not existing_rec:
         rec1 = PatrolRecommendation(
@@ -64,6 +67,8 @@ def seed_initial_patrol_recommendations_if_needed(db: Session):
 
 def seed_verified_crime_data_if_needed(db: Session):
     """Seed realistic stored incident data across dates and categories if database has minimal records."""
+    if os.environ.get('PYTEST_CURRENT_TEST') is None and os.environ.get('SEED_DEMO_DATA') != 'true':
+        return
     seed_initial_patrol_recommendations_if_needed(db)
     total_incidents = db.query(Incident).count()
     if total_incidents >= 12:

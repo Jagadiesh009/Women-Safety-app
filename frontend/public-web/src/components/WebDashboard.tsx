@@ -355,7 +355,7 @@ export const WebDashboard: React.FC<WebDashboardProps> = ({ onNavigate }) => {
                     <div className="min-w-0">
                       <div className="text-xs font-bold text-[#28151D] truncate">{inc.type}</div>
                       <div className="text-[11px] text-[#81747D] truncate">
-                        {inc.location.addressLabel || 'Near VIT-AP University'}
+                        {inc.location.addressLabel || (inc.location.latitude && inc.location.longitude ? `${inc.location.latitude.toFixed(4)}, ${inc.location.longitude.toFixed(4)}` : 'Location Recorded')}
                       </div>
                     </div>
                   </div>
@@ -365,55 +365,10 @@ export const WebDashboard: React.FC<WebDashboardProps> = ({ onNavigate }) => {
                 </div>
               ))
             ) : (
-              /* Fallback verified mock display or calm empty state */
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between py-1 border-b border-[#FAF2F4]">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-red-50 text-[#DC2626] flex items-center justify-center shrink-0">
-                      <AlertTriangle size={14} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#28151D]">Suspicious Activity</div>
-                      <div className="text-[11px] text-[#81747D] truncate">Near VIT-AP University</div>
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-[#81747D] font-medium text-right shrink-0">
-                    <div>Oct 10</div>
-                    <div>08:24 PM</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between py-1 border-b border-[#FAF2F4]">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-[#D97706] flex items-center justify-center shrink-0">
-                      <ShieldCheck size={14} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#28151D]">Harassment</div>
-                      <div className="text-[11px] text-[#81747D] truncate">Inavolu Main Road</div>
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-[#81747D] font-medium text-right shrink-0">
-                    <div>Oct 02</div>
-                    <div>06:11 PM</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between py-1">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-neutral-100 text-neutral-600 flex items-center justify-center shrink-0">
-                      <FileText size={14} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#28151D]">Other</div>
-                      <div className="text-[11px] text-[#81747D] truncate">VIT-AP Campus</div>
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-[#81747D] font-medium text-right shrink-0">
-                    <div>Sep 25</div>
-                    <div>04:30 PM</div>
-                  </div>
-                </div>
+              <div className="py-8 text-center text-xs text-[#81747D]">
+                <ShieldCheck size={28} className="mx-auto mb-2 text-[#C4B5BC] opacity-60" />
+                <p className="font-semibold text-[#28151D]">No incidents recorded</p>
+                <p className="text-[11px] text-[#81747D] mt-0.5">Your area is currently calm. Any alerts or reports will appear here.</p>
               </div>
             )}
           </div>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" width="100%" height="100%" style="background:#0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <filter id="patrolShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+    <marker id="patrolArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60A5FA" />
+    </marker>
+  </defs>
+
+  <text x="500" y="35" text-anchor="middle" fill="#F8FAFC" font-size="20" font-weight="700">POLICE PATROL &amp; DISPATCH LIFECYCLE</text>
+  <text x="500" y="58" text-anchor="middle" fill="#94A3B8" font-size="12">Officer Duty States • Location Telemetry Streaming • Spatial Sector Coverage</text>
+
+  <!-- Step 1: Officer Auth -->
+  <rect x="40" y="90" width="200" height="210" rx="10" fill="#1E293B" stroke="#3B82F6" stroke-width="1.5" filter="url(#patrolShadow)"/>
+  <rect x="55" y="105" width="28" height="28" rx="6" fill="#3B82F6"/>
+  <text x="64" y="124" fill="#FFF" font-size="13" font-weight="bold">1</text>
+  <text x="92" y="124" fill="#F8FAFC" font-size="14" font-weight="bold">BADGE AUTH</text>
+  <text x="55" y="155" fill="#93C5FD" font-size="11" font-weight="600">Verification Steps:</text>
+  <text x="55" y="175" fill="#CBD5E1" font-size="11">• Badge ID: POL-102</text>
+  <text x="55" y="195" fill="#CBD5E1" font-size="11">• Dept Password Verify</text>
+  <text x="55" y="215" fill="#CBD5E1" font-size="11">• Role POLICE Check</text>
+  <text x="55" y="240" fill="#94A3B8" font-size="10">Generates JWT token with</text>
+  <text x="55" y="255" fill="#94A3B8" font-size="10">police claim and badge</text>
+  <rect x="55" y="270" width="170" height="20" rx="4" fill="#1E3A8A"/>
+  <text x="140" y="284" text-anchor="middle" fill="#93C5FD" font-size="10" font-weight="600">OFFICER AUTHENTICATED</text>
+
+  <line x1="240" y1="195" x2="275" y2="195" stroke="#60A5FA" stroke-width="2" marker-end="url(#patrolArrow)"/>
+
+  <!-- Step 2: Duty Toggle -->
+  <rect x="275" y="90" width="200" height="210" rx="10" fill="#1E293B" stroke="#10B981" stroke-width="1.5" filter="url(#patrolShadow)"/>
+  <rect x="290" y="105" width="28" height="28" rx="6" fill="#10B981"/>
+  <text x="299" y="124" fill="#FFF" font-size="13" font-weight="bold">2</text>
+  <text x="327" y="124" fill="#F8FAFC" font-size="14" font-weight="bold">DUTY STATUS</text>
+  <text x="290" y="155" fill="#34D399" font-size="11" font-weight="600">State Transition:</text>
+  <text x="290" y="175" fill="#CBD5E1" font-size="11">• Toggle ON DUTY</text>
+  <text x="290" y="195" fill="#CBD5E1" font-size="11">• /police/duty endpoint</text>
+  <text x="290" y="215" fill="#CBD5E1" font-size="11">• Enters dispatch pool</text>
+  <text x="290" y="240" fill="#94A3B8" font-size="10">Eligible for SOS alerts</text>
+  <text x="290" y="255" fill="#94A3B8" font-size="10">within configured radius</text>
+  <rect x="290" y="270" width="170" height="20" rx="4" fill="#064E3B"/>
+  <text x="375" y="284" text-anchor="middle" fill="#6EE7B7" font-size="10" font-weight="600">STATUS: ON DUTY</text>
+
+  <line x1="475" y1="195" x2="510" y2="195" stroke="#60A5FA" stroke-width="2" marker-end="url(#patrolArrow)"/>
+
+  <!-- Step 3: Location Telemetry -->
+  <rect x="510" y="90" width="200" height="210" rx="10" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5" filter="url(#patrolShadow)"/>
+  <rect x="525" y="105" width="28" height="28" rx="6" fill="#F59E0B"/>
+  <text x="534" y="124" fill="#FFF" font-size="13" font-weight="bold">3</text>
+  <text x="562" y="124" fill="#F8FAFC" font-size="14" font-weight="bold">PATROL STREAM</text>
+  <text x="525" y="155" fill="#FBBF24" font-size="11" font-weight="600">Telemetry Sync:</text>
+  <text x="525" y="175" fill="#CBD5E1" font-size="11">• 15-second GPS interval</text>
+  <text x="525" y="195" fill="#CBD5E1" font-size="11">• POST /police/location</text>
+  <text x="525" y="215" fill="#CBD5E1" font-size="11">• Battery &amp; speed payload</text>
+  <text x="525" y="240" fill="#94A3B8" font-size="10">Breadcrumbs saved to DB</text>
+  <text x="525" y="255" fill="#94A3B8" font-size="10">for admin live tracking</text>
+  <rect x="525" y="270" width="170" height="20" rx="4" fill="#78350F"/>
+  <text x="610" y="284" text-anchor="middle" fill="#FDE68A" font-size="10" font-weight="600">TELEMETRY STREAMING</text>
+
+  <line x1="710" y1="195" x2="745" y2="195" stroke="#60A5FA" stroke-width="2" marker-end="url(#patrolArrow)"/>
+
+  <!-- Step 4: Sector Coverage & Action -->
+  <rect x="745" y="90" width="215" height="210" rx="10" fill="#1E293B" stroke="#8B5CF6" stroke-width="1.5" filter="url(#patrolShadow)"/>
+  <rect x="760" y="105" width="28" height="28" rx="6" fill="#8B5CF6"/>
+  <text x="769" y="124" fill="#FFF" font-size="13" font-weight="bold">4</text>
+  <text x="797" y="124" fill="#F8FAFC" font-size="14" font-weight="bold">TACTICAL ACTION</text>
+  <text x="760" y="155" fill="#C084FC" font-size="11" font-weight="600">Operations:</text>
+  <text x="760" y="175" fill="#CBD5E1" font-size="11">• SOS Dispatch Radar</text>
+  <text x="760" y="195" fill="#CBD5E1" font-size="11">• Patrol Recommendations</text>
+  <text x="760" y="215" fill="#CBD5E1" font-size="11">• Sector Crime Markers</text>
+  <text x="760" y="240" fill="#94A3B8" font-size="10">Accepts distress call</text>
+  <text x="760" y="255" fill="#94A3B8" font-size="10">or patrols hotspot area</text>
+  <rect x="760" y="270" width="185" height="20" rx="4" fill="#581C87"/>
+  <text x="852" y="284" text-anchor="middle" fill="#E9D5FF" font-size="10" font-weight="600">SECTOR ACTIVE</text>
+
+  <rect x="40" y="325" width="920" height="35" rx="6" fill="#1E293B"/>
+  <text x="500" y="347" text-anchor="middle" fill="#94A3B8" font-size="11">
+    Police Session: <tspan fill="#60A5FA">JWT Auth</tspan> ➔ Duty: <tspan fill="#34D399">is_on_duty = true</tspan> ➔ Telemetry: <tspan fill="#FBBF24">15s GPS Ping</tspan> ➔ Coverage: <tspan fill="#C084FC">1–5km Haversine Ring</tspan>
+  </text>
+</svg>

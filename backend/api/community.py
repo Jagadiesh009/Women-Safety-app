@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
+import os
 
 from database.models import (
     Incident,
@@ -23,6 +24,8 @@ from api.crime import LOCALITY_CENTROIDS, seed_verified_crime_data_if_needed
 router = APIRouter(prefix="/community", tags=["Community Safety"])
 
 def seed_sample_alerts_if_needed(db: Session):
+    if os.environ.get('PYTEST_CURRENT_TEST') is None and os.environ.get('SEED_DEMO_DATA') != 'true':
+        return
     count = db.query(CommunitySafetyAlert).count()
     if count == 0:
         now = datetime.now(timezone.utc)

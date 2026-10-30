@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, 
-  ShieldAlert,
   Sun, 
   Moon, 
   Menu, 
@@ -18,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { usePoliceAuth } from '../context/PoliceAuthContext';
 import { APP_CONFIG } from '../config/appConfig';
 import type { PageView } from '../types';
 
@@ -35,7 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { toggleTheme, isDark } = useTheme();
   const { user, isGuest, signOut } = useAuth();
-  const { officer, logoutPolice } = usePoliceAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -58,13 +55,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
     await signOut();
-    onNavigate('welcome');
-  };
-
-  const handlePoliceLogout = () => {
-    setUserDropdownOpen(false);
-    setMobileMenuOpen(false);
-    logoutPolice();
     onNavigate('welcome');
   };
 
@@ -127,43 +117,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </nav>
           </div>
 
-          {/* Right Action Bar: Police Portal, Theme, APK Download, Auth */}
+          {/* Right Action Bar: Theme, APK Download, Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* POLICE OFFICER CONSOLE SHORTCUT (IF LOGGED IN) */}
-            {officer ? (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => handleLinkClick('police-dashboard')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-400 text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
-                  title={`Police Console - ${officer.rank} ${officer.name}`}
-                >
-                  <ShieldAlert size={13} className="text-amber-400" />
-                  <span>Police ({officer.badge_number})</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePoliceLogout}
-                  className="p-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                  title="Sign out of police portal"
-                  aria-label="Officer sign out"
-                >
-                  <LogOut size={13} />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  window.location.hash = 'welcome';
-                  onNavigate('welcome');
-                }}
-                className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-amber-500 border border-[var(--border-subtle)] transition-colors cursor-pointer"
-                title="Law enforcement access"
-              >
-                <ShieldAlert size={12} className="text-amber-500" />
-                <span>Police Portal</span>
-              </button>
-            )}
-
             {/* Android APK Download Action */}
             <a
               href={APP_CONFIG.apkDownloadUrl}
@@ -298,16 +253,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{link.label}</span>
               </button>
             ))}
-
-            {officer && (
-              <button
-                onClick={() => handleLinkClick('police-dashboard')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-amber-500 bg-slate-900 border border-amber-500/30 transition-colors cursor-pointer"
-              >
-                <ShieldAlert size={14} />
-                <span>Police Dispatch Console ({officer.badge_number})</span>
-              </button>
-            )}
 
             {user && (
               <button
