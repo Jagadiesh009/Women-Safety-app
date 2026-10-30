@@ -9,28 +9,26 @@ import {
   Sun, 
   Moon, 
   Smartphone,
-  Lock,
   BadgeAlert,
   Radio,
+  ExternalLink,
+  Lock,
   FileKey
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePoliceAuth } from '../context/PoliceAuthContext';
-import { useAdminAuth } from '../context/AdminAuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { APP_CONFIG } from '../config/appConfig';
 
 interface WelcomeAuthViewProps {
   onEnterDashboard: () => void;
   onEnterPoliceDashboard?: () => void;
-  onEnterAdminDashboard?: () => void;
-  initialPortal?: 'user' | 'police' | 'admin';
+  initialPortal?: 'user' | 'police';
 }
 
 export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({ 
   onEnterDashboard,
   onEnterPoliceDashboard,
-  onEnterAdminDashboard,
   initialPortal = 'user'
 }) => {
   const { 
@@ -52,17 +50,12 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
     clearError: clearPoliceError
   } = usePoliceAuth();
 
-  const {
-    loginAdmin,
-    isLoading: adminLoading,
-    error: adminError,
-    clearError: clearAdminError
-  } = useAdminAuth();
+
 
   const { toggleTheme, isDark } = useTheme();
 
   // Tri-Portal Mode: 'user' | 'police' | 'admin'
-  const [portalMode, setPortalMode] = useState<'user' | 'police' | 'admin'>(initialPortal);
+  const [portalMode, setPortalMode] = useState<'user' | 'police'>(initialPortal);
 
   // User auth state
   const [activeTab, setActiveTab] = useState<'signin' | 'register' | 'forgot'>('signin');
@@ -79,17 +72,13 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
   const [policePassword, setPolicePassword] = useState('');
   const [showPolicePassword, setShowPolicePassword] = useState(false);
 
-  // Admin auth state
-  const [adminId, setAdminId] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
-  const [showAdminPassword, setShowAdminPassword] = useState(false);
 
-  const handlePortalSwitch = (mode: 'user' | 'police' | 'admin') => {
+
+  const handlePortalSwitch = (mode: 'user' | 'police') => {
     setPortalMode(mode);
     setValidationError(null);
     clearAuthMessages();
     clearPoliceError();
-    clearAdminError();
   };
 
   const handleTabChange = (tab: 'signin' | 'register' | 'forgot') => {
@@ -172,31 +161,6 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
     }
   };
 
-  const handleAdminSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError(null);
-    clearAdminError();
-
-    if (!adminId.trim()) {
-      setValidationError('Please enter your Administrator ID or Username.');
-      return;
-    }
-
-    if (!adminPassword) {
-      setValidationError('Please enter your administrator passphrase.');
-      return;
-    }
-
-    const success = await loginAdmin(adminId.trim(), adminPassword);
-    if (success) {
-      if (onEnterAdminDashboard) {
-        onEnterAdminDashboard();
-      } else {
-        window.location.hash = 'admin-dashboard';
-      }
-    }
-  };
-
   const handleGuestEntry = () => {
     continueAsGuest();
     onEnterDashboard();
@@ -264,7 +228,7 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
       <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md mx-auto space-y-4">
 
-          {/* THREE-PORTALS SELECTOR: User vs Police vs Admin */}
+          {/* ROLE SELECTOR: Civilian User vs Police Officer */}
           <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-1.5 shadow-xs flex items-center gap-1">
             <button
               type="button"
@@ -276,7 +240,7 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
               }`}
             >
               <ShieldCheck size={13} />
-              <span>User</span>
+              <span>Civilian User</span>
             </button>
 
             <button
@@ -289,20 +253,7 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
               }`}
             >
               <ShieldAlert size={13} className={portalMode === 'police' ? 'text-amber-400' : 'text-slate-400'} />
-              <span>Police</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handlePortalSwitch('admin')}
-              className={`flex-1 py-2 px-2 sm:px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                portalMode === 'admin'
-                  ? 'bg-indigo-950 text-indigo-300 border border-indigo-500/40 shadow-xs'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }`}
-            >
-              <Lock size={13} className={portalMode === 'admin' ? 'text-indigo-400' : 'text-slate-400'} />
-              <span>Admin</span>
+              <span>Police Officer</span>
             </button>
           </div>
 
@@ -411,117 +362,6 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
                     <div>Supervisor: <strong>POL-101</strong> (Inspector Priya Sharma)</div>
                     <div>Patrol Officer: <strong>POL-102</strong> (Officer Ramesh Kumar)</div>
                     <div>Password: <strong>PoliceSecure@2026</strong></div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          )}
-
-          {/* ADMINISTRATOR PORTAL INTERFACE */}
-          {portalMode === 'admin' && (
-            <div className="space-y-4 animate-fade-in">
-              <div className="text-center space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
-                  <Lock size={12} />
-                  <span>Master Administrator Gate</span>
-                </div>
-                <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
-                  Admin Command Console
-                </h2>
-                <p className="text-xs text-[var(--text-secondary)]">
-                  Administrative oversight, police provisioning, and system intelligence.
-                </p>
-              </div>
-
-              {/* Admin Card */}
-              <div className="bg-[var(--bg-surface)] border border-indigo-500/30 rounded-xl p-5 space-y-3.5 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600"></div>
-
-                {/* Error Banner */}
-                {(validationError || adminError) && (
-                  <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs flex items-start gap-2">
-                    <AlertCircle size={14} className="shrink-0 mt-0.5" />
-                    <span>{validationError || adminError}</span>
-                  </div>
-                )}
-
-                {/* Admin Sign-in Form */}
-                <form onSubmit={handleAdminSubmit} className="space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
-                      Administrator ID / Username
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={adminId}
-                        onChange={(e) => setAdminId(e.target.value)}
-                        placeholder="e.g. admin"
-                        className="w-full px-3 py-2.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-indigo-500 font-mono"
-                        required
-                        autoFocus
-                      />
-                      <FileKey size={14} className="absolute right-3 top-3 text-[var(--text-muted)]" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">
-                      Administrator Secure Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showAdminPassword ? 'text' : 'password'}
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
-                        placeholder="••••••••••••"
-                        className="w-full pl-3 pr-8 py-2.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-indigo-500 font-mono"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowAdminPassword(!showAdminPassword)}
-                        className="absolute right-2.5 top-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
-                        aria-label="Toggle password visibility"
-                      >
-                        {showAdminPassword ? <EyeOff size={13} /> : <Eye size={13} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={adminLoading}
-                    className="w-full py-2.5 px-3 rounded-lg bg-indigo-950 hover:bg-indigo-900 text-indigo-300 font-bold text-xs border border-indigo-500/40 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
-                  >
-                    {adminLoading ? (
-                      <span className="w-4 h-4 border-2 border-indigo-400/30 border-t-indigo-400 rounded-full animate-spin"></span>
-                    ) : (
-                      <>
-                        <Lock size={13} />
-                        <span>Verify Master Role &amp; Enter Console</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                {/* Security & Provisioning Notice */}
-                <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-[11px] text-[var(--text-secondary)]">
-                  <div className="flex items-start gap-1.5 text-[10px] text-[var(--text-muted)] leading-tight">
-                    <ShieldAlert size={12} className="shrink-0 mt-0.5 text-indigo-500" />
-                    <span>
-                      <strong>Strict Administrator Access:</strong> Public registration is permanently disabled. Access is guarded by cryptographic tokens verified at the backend API layer.
-                    </span>
-                  </div>
-
-                  {/* Seeded Testing Accounts Helper */}
-                  <div className="p-2 rounded-lg bg-indigo-500/5 border border-indigo-500/15 text-[10px] text-indigo-700 dark:text-indigo-300 font-mono">
-                    <div className="font-sans font-semibold mb-0.5 text-indigo-800 dark:text-indigo-200">
-                      System Administrator Credentials:
-                    </div>
-                    <div>Admin ID: <strong>admin</strong></div>
-                    <div>Password: <strong>admin123</strong></div>
                   </div>
                 </div>
 
@@ -800,14 +640,14 @@ export const WelcomeAuthView: React.FC<WelcomeAuthViewProps> = ({
             </a>
             <span>•</span>
             <a 
-              href="#admin-dashboard" 
-              onClick={(e) => {
-                e.preventDefault();
-                handlePortalSwitch('admin');
-              }}
-              className="hover:text-indigo-400 transition-colors"
+              href="https://safeherwebadmin.vercel.app/" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--brand-primary)] transition-colors inline-flex items-center gap-1"
+              title="Open SafeHer Safety Operations Center & Admin Portal"
             >
-              Admin Portal
+              <span>Admin Portal</span>
+              <ExternalLink size={10} />
             </a>
           </div>
 

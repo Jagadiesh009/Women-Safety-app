@@ -146,3 +146,4 @@ def test_admin_safety_advisory_broadcast():
     toggle_resp = client.put(f"/admin/advisories/{advisory_id}/toggle", headers=headers)
     assert toggle_resp.status_code == 200
     assert toggle_resp.json()["is_active"] is False
+

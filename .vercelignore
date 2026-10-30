@@ -2,7 +2,6 @@
 
 backend/
 frontend/mobile/
-frontend/admin/
 database/
 deployment/
 docker/

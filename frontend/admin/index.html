@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeHer - Safety Operations Center</title>
+    <title>SafeHer - Safety Operations Center & Admin Command</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -37,6 +37,9 @@
             --status-success: #059669;
             --status-success-bg: rgba(5, 150, 105, 0.1);
             --status-success-text: #047857;
+            --status-info: #2563EB;
+            --status-info-bg: rgba(37, 99, 235, 0.1);
+            --status-info-text: #1D4ED8;
             
             --shadow-card: 0 1px 3px rgba(42, 22, 26, 0.06), 0 4px 12px rgba(42, 22, 26, 0.03);
             --shadow-elevated: 0 4px 16px rgba(42, 22, 26, 0.08), 0 12px 28px rgba(42, 22, 26, 0.05);
@@ -70,6 +73,9 @@
             --status-success: #10B981;
             --status-success-bg: rgba(16, 185, 129, 0.18);
             --status-success-text: #6EE7B7;
+            --status-info: #3B82F6;
+            --status-info-bg: rgba(59, 130, 246, 0.18);
+            --status-info-text: #93C5FD;
             
             --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.45);
             --shadow-elevated: 0 6px 20px rgba(0, 0, 0, 0.55);
@@ -105,8 +111,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.75rem;
             padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-subtle);
             flex-wrap: wrap;
             gap: 1rem;
@@ -119,67 +125,81 @@
         }
 
         .brand-logo-badge {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #780D2B, #B23A5B);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--rose-accent));
             display: flex;
             align-items: center;
             justify-content: center;
             color: #FFFFFF;
-            font-size: 1.25rem;
-            box-shadow: 0 4px 12px rgba(120, 13, 43, 0.3);
-            flex-shrink: 0;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 12px rgba(120, 13, 43, 0.35);
         }
 
         .brand-title-wrap h1 {
+            font-size: 1.45rem;
             font-weight: 800;
-            font-size: 1.35rem;
             letter-spacing: -0.02em;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             line-height: 1.2;
+        }
+
+        .live-ops-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: var(--status-emergency-bg);
+            color: var(--status-emergency-text);
+            padding: 0.2rem 0.55rem;
+            border-radius: 20px;
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .pulse-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--status-emergency);
+            box-shadow: 0 0 0 rgba(225, 29, 72, 0.7);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
         }
 
         .brand-subtitle {
             font-size: 0.8rem;
             color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .live-ops-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            background: var(--brand-subtle);
-            border: 1px solid var(--brand-border);
-            color: var(--rose-accent);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            margin-top: 0.15rem;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.65rem;
             flex-wrap: wrap;
         }
 
         .btn-theme-toggle {
             background: var(--bg-surface-elevated);
-            border: 1px solid var(--border-medium);
             color: var(--text-primary);
-            padding: 0.45rem 0.85rem;
+            border: 1px solid var(--border-medium);
+            padding: 0.5rem 0.85rem;
             border-radius: 8px;
+            cursor: pointer;
             font-size: 0.82rem;
             font-weight: 600;
-            cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -191,15 +211,77 @@
         }
 
         .admin-profile-pill {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
             background: var(--bg-surface-elevated);
             border: 1px solid var(--border-subtle);
-            padding: 0.35rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
+            font-weight: 600;
             color: var(--text-primary);
+        }
+
+        /* --- Buttons --- */
+        .btn-small {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-medium);
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+        .btn-small:hover:not(:disabled) {
+            background: var(--bg-surface-hover);
+            border-color: var(--brand-primary);
+        }
+        .btn-small:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--brand-primary);
+            color: #FFFFFF;
+            border: 1px solid var(--brand-primary);
+            padding: 0.45rem 0.95rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(120, 13, 43, 0.25);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--brand-hover);
+            box-shadow: 0 4px 10px rgba(120, 13, 43, 0.35);
+        }
+
+        .btn-success {
+            background: var(--status-success);
+            color: #FFFFFF;
+            border: none;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .btn-success:hover:not(:disabled) {
+            filter: brightness(1.1);
         }
 
         /* --- Tabs --- */
@@ -208,39 +290,41 @@
             gap: 0.5rem;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-subtle);
-            padding-bottom: 0.75rem;
+            padding-bottom: 0.65rem;
+            overflow-x: auto;
         }
 
         .btn-tab {
             background: transparent;
-            border: 1px solid transparent;
             color: var(--text-secondary);
-            font-size: 0.92rem;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 0.5rem 1.1rem;
+            border: 1px solid transparent;
+            padding: 0.6rem 1.1rem;
             border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
+            white-space: nowrap;
         }
         .btn-tab:hover {
             color: var(--text-primary);
             background: var(--bg-surface-elevated);
         }
         .btn-tab.active {
-            color: #FFFFFF;
             background: var(--brand-primary);
+            color: #FFFFFF;
             border-color: var(--brand-primary);
             box-shadow: 0 2px 8px rgba(120, 13, 43, 0.25);
         }
 
-        /* --- Overview Stats Grid --- */
+        /* --- Overview Stats Grid (7 Cards) --- */
         .stats-overview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 1rem;
             margin-bottom: 1.75rem;
         }
 
@@ -248,7 +332,7 @@
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: 12px;
-            padding: 1.25rem 1.4rem;
+            padding: 1.1rem 1.25rem;
             box-shadow: var(--shadow-card);
             transition: transform 0.2s ease, border-color 0.2s ease;
             position: relative;
@@ -264,24 +348,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .stat-title {
-            font-size: 0.78rem;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
         }
 
         .stat-icon {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             opacity: 0.85;
         }
 
         .stat-value {
-            font-size: 2.2rem;
+            font-size: 1.95rem;
             font-weight: 800;
             letter-spacing: -0.03em;
             line-height: 1.1;
@@ -290,18 +374,27 @@
         }
 
         .stat-meta {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-top: 0.35rem;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        /* --- Operations Layout (Left Queue, Right Map) --- */
+        /* --- Panels & Grids --- */
         .operations-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
             gap: 1.5rem;
             align-items: start;
             margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .operations-layout {
+                grid-template-columns: 1fr;
+            }
         }
 
         .panel {
@@ -310,7 +403,7 @@
             border-radius: 14px;
             padding: 1.35rem;
             box-shadow: var(--shadow-card);
-            min-width: 0; /* Prevents flex/grid clipping */
+            min-width: 0;
         }
 
         .panel-header {
@@ -333,11 +426,14 @@
 
         .panel-badge {
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-muted);
+            background: var(--bg-surface-elevated);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
         }
 
-        /* --- Toolbar & Filter Controls --- */
+        /* --- Incident Toolbar --- */
         .incident-toolbar {
             background: var(--bg-surface-elevated);
             border: 1px solid var(--border-subtle);
@@ -361,7 +457,7 @@
             display: flex;
             align-items: center;
             flex: 1;
-            min-width: 240px;
+            min-width: 220px;
         }
 
         .search-icon {
@@ -398,17 +494,6 @@
             font-size: 0.8rem;
             padding: 0.15rem 0.4rem;
             border-radius: 4px;
-            line-height: 1;
-        }
-        .clear-search-btn:hover {
-            color: var(--text-primary);
-            background: var(--bg-surface-hover);
-        }
-
-        /* Status Dropdown with High Contrast Options */
-        .status-select-wrap {
-            position: relative;
-            min-width: 160px;
         }
 
         select {
@@ -422,21 +507,14 @@
             font-weight: 500;
             cursor: pointer;
             outline: none;
-            width: 100%;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C777A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
-            transition: all 0.2s ease;
         }
         select:focus {
             border-color: var(--brand-primary);
             box-shadow: 0 0 0 3px var(--brand-subtle);
-        }
-        select option {
-            background-color: var(--bg-surface-elevated);
-            color: var(--text-primary);
-            padding: 0.5rem;
         }
 
         .toolbar-bottom-row {
@@ -471,14 +549,12 @@
         .status-pill:hover {
             border-color: var(--border-medium);
             color: var(--text-primary);
-            background: var(--bg-surface-hover);
         }
         .status-pill.active {
             background: var(--brand-primary);
             border-color: var(--brand-primary);
             color: #FFFFFF;
         }
-
         .pill-count {
             background: rgba(0, 0, 0, 0.15);
             padding: 0.05rem 0.38rem;
@@ -491,191 +567,6 @@
             color: #FFFFFF;
         }
 
-        .toolbar-action-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* --- Incident Cards Queue --- */
-        .incident-list {
-            max-height: 580px;
-            overflow-y: auto;
-            padding-right: 0.4rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
-
-        .incident-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .incident-list::-webkit-scrollbar-track {
-            background: var(--bg-surface-elevated);
-            border-radius: 4px;
-        }
-        .incident-list::-webkit-scrollbar-thumb {
-            background: var(--border-medium);
-            border-radius: 4px;
-        }
-
-        .incident-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            padding: 1rem 1.15rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            border-left: 4px solid var(--border-medium);
-            min-width: 0;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-        .incident-card:hover {
-            border-color: var(--brand-border);
-            background: var(--bg-surface-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-card);
-        }
-        .incident-card.active-card {
-            border-color: var(--brand-primary);
-            background: var(--brand-subtle);
-            box-shadow: 0 0 0 2px var(--brand-border);
-        }
-
-        .incident-card.border-ACTIVE { border-left-color: var(--status-emergency) !important; }
-        .incident-card.border-IN_PROGRESS, .incident-card.border-ACKNOWLEDGED { border-left-color: var(--status-warning) !important; }
-        .incident-card.border-RESOLVED { border-left-color: var(--status-success) !important; opacity: 0.92; }
-
-        .card-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .incident-type-tag {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .incident-id-tag {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .status-badge {
-            padding: 0.22rem 0.65rem;
-            border-radius: 14px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            white-space: nowrap;
-            letter-spacing: 0.02em;
-        }
-        .status-ACTIVE { background: var(--status-emergency-bg); color: var(--status-emergency-text); }
-        .status-IN_PROGRESS, .status-ACKNOWLEDGED { background: var(--status-warning-bg); color: var(--status-warning-text); }
-        .status-RESOLVED, .status-ENDED { background: var(--status-success-bg); color: var(--status-success-text); }
-
-        .pulse-indicator {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            background-color: var(--status-emergency);
-            border-radius: 50%;
-            animation: activePulse 1.8s infinite;
-        }
-        @keyframes activePulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-        }
-
-        .card-details-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.25rem;
-            font-size: 0.83rem;
-            color: var(--text-secondary);
-        }
-
-        .card-details-grid strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .card-actions-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.45rem;
-            margin-top: 0.4rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--border-subtle);
-            flex-wrap: wrap;
-        }
-
-        /* --- Buttons --- */
-        button {
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .btn-small {
-            background: var(--bg-surface-elevated);
-            border: 1px solid var(--border-medium);
-            color: var(--text-primary);
-            padding: 0.38rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-        .btn-small:hover {
-            background: var(--bg-surface-hover);
-            border-color: var(--brand-primary);
-        }
-
-        .btn-resolve {
-            background: var(--status-success);
-            color: #FFFFFF;
-            border: none;
-            padding: 0.4rem 0.85rem;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
-        }
-        .btn-resolve:hover:not(:disabled) {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.35);
-        }
-        .btn-resolve:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
         .btn-resolve-all {
             background: var(--brand-subtle);
             color: var(--rose-accent);
@@ -684,6 +575,7 @@
             border-radius: 6px;
             font-size: 0.78rem;
             font-weight: 600;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
@@ -691,43 +583,151 @@
         .btn-resolve-all:hover:not(:disabled) {
             background: var(--brand-primary);
             color: #FFFFFF;
-            border-color: var(--brand-primary);
         }
         .btn-resolve-all:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-            border-color: var(--border-subtle);
+        }
+
+        /* --- Incident Cards Queue --- */
+        .incident-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            max-height: 720px;
+            overflow-y: auto;
+            padding-right: 0.35rem;
+        }
+
+        .incident-card {
             background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 1rem 1.15rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-left: 4px solid var(--status-warning);
+        }
+        .incident-card:hover {
+            background: var(--bg-surface-hover);
+            border-color: var(--border-medium);
+            transform: translateX(2px);
+        }
+        .incident-card.active-card {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 2px var(--brand-subtle);
+        }
+        .incident-card.status-ACTIVE { border-left-color: var(--status-emergency); }
+        .incident-card.status-IN_PROGRESS { border-left-color: var(--status-warning); }
+        .incident-card.status-RESOLVED { border-left-color: var(--status-success); }
+
+        .incident-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.45rem;
+        }
+
+        .incident-id-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
             color: var(--text-muted);
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .status-ACTIVE {
+            background: var(--status-emergency-bg);
+            color: var(--status-emergency-text);
+        }
+        .status-IN_PROGRESS {
+            background: var(--status-warning-bg);
+            color: var(--status-warning-text);
+        }
+        .status-RESOLVED {
+            background: var(--status-success-bg);
+            color: var(--status-success-text);
+        }
+
+        .incident-victim-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .incident-meta-row {
+            display: flex;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.65rem;
+        }
+
+        .incident-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 0.65rem;
+            margin-top: 0.35rem;
+        }
+
+        .btn-resolve {
+            background: var(--status-success);
+            color: #FFFFFF;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .btn-resolve:hover:not(:disabled) {
+            filter: brightness(1.1);
+        }
+
         .btn-view {
-            background: var(--bg-surface-elevated);
+            background: var(--bg-surface);
             color: var(--text-primary);
             border: 1px solid var(--border-medium);
-            padding: 0.4rem 0.8rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 6px;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 600;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
         }
         .btn-view:hover {
-            background: var(--bg-surface-hover);
             border-color: var(--brand-primary);
         }
 
         /* --- Situational Map Panel --- */
         #map {
-            height: 360px;
+            height: 380px;
             width: 100%;
             border-radius: 10px;
             border: 1px solid var(--border-subtle);
             background: var(--bg-surface-elevated);
             z-index: 1;
         }
-
         .leaflet-tile {
             filter: var(--map-tile-filter);
         }
@@ -742,185 +742,177 @@
             color: var(--text-muted);
             flex-wrap: wrap;
         }
-
         .legend-item {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
         }
-
         .legend-dot {
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
         }
 
-        .leaflet-popup-content-wrapper {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-medium);
-            border-radius: 10px;
-            box-shadow: var(--shadow-elevated);
-        }
-        .leaflet-popup-tip {
-            background: var(--bg-surface);
-        }
-
-        /* Situational System Notes below map */
         .system-status-box {
             margin-top: 1rem;
-            padding: 0.85rem;
-            border-radius: 10px;
             background: var(--bg-surface-elevated);
             border: 1px solid var(--border-subtle);
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            border-radius: 8px;
+            padding: 0.85rem;
         }
-
         .system-status-header {
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 0.35rem;
+            margin-bottom: 0.3rem;
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
 
-        /* --- Empty, Loading & Error States --- */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1.5rem;
-            background: var(--bg-surface-elevated);
+        /* --- Common Table Styling --- */
+        .data-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
             border-radius: 10px;
-            border: 1px dashed var(--border-medium);
-        }
-        .empty-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.7;
-        }
-        .empty-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-        .empty-desc {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
-        /* --- Modals --- */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(20, 10, 13, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            backdrop-filter: blur(4px);
-            padding: 1rem;
-        }
-
-        .modal-content {
             background: var(--bg-surface);
-            border: 1px solid var(--border-medium);
-            border-radius: 14px;
+        }
+
+        .data-table {
             width: 100%;
-            max-width: 780px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 1.75rem;
-            box-shadow: var(--shadow-modal);
+            border-collapse: collapse;
+            font-size: 0.83rem;
+        }
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+        }
+        .data-table th {
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            background: var(--bg-surface-elevated);
+            letter-spacing: 0.05em;
+        }
+        .data-table tr:hover td {
+            background: var(--bg-surface-hover);
+        }
+
+        /* --- Badges --- */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            line-height: 1;
+        }
+        .badge-verified {
+            background: var(--status-success-bg);
+            color: var(--status-success-text);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+        }
+        .badge-unverified {
+            background: var(--status-warning-bg);
+            color: var(--status-warning-text);
+            border: 1px solid rgba(217, 119, 6, 0.3);
+        }
+        .badge-onduty {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .badge-offduty {
+            background: rgba(158, 137, 143, 0.15);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
+        .badge-active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3B82F6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .badge-deactivated {
+            background: rgba(225, 29, 72, 0.15);
+            color: var(--status-emergency-text);
+            border: 1px solid rgba(225, 29, 72, 0.3);
+        }
+        .badge-danger {
+            background: var(--status-emergency-bg);
+            color: var(--status-emergency-text);
+        }
+        .badge-warning {
+            background: var(--status-warning-bg);
+            color: var(--status-warning-text);
+        }
+        .badge-info {
+            background: var(--status-info-bg);
+            color: var(--status-info-text);
+        }
+
+        /* --- Crime Intelligence Sector Cards --- */
+        .crime-rankings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ranking-card {
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
             position: relative;
         }
+        .ranking-card.risk-HIGH { border-left: 4px solid var(--status-emergency); }
+        .ranking-card.risk-MODERATE { border-left: 4px solid var(--status-warning); }
+        .ranking-card.risk-LOW { border-left: 4px solid var(--status-success); }
 
-        .modal-header {
+        .ranking-locality {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .ranking-stats {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.85rem;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-
-        .close-btn {
-            background: transparent;
-            border: none;
-            font-size: 1.4rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            cursor: pointer;
-            line-height: 1;
-            padding: 0.2rem;
-        }
-        .close-btn:hover {
-            color: var(--status-emergency);
         }
 
-        .detail-grid {
+        /* --- Patrol Recommendations Cards --- */
+        .recommendations-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 0.85rem;
-            margin-bottom: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
         }
 
-        .detail-item {
+        .recommendation-card {
             background: var(--bg-surface-elevated);
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
             border: 1px solid var(--border-subtle);
-        }
-
-        .detail-label {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.2rem;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-
-        .contacts-table, .history-table, .users-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-        .contacts-table th, .contacts-table td,
-        .history-table th, .history-table td,
-        .users-table th, .users-table td {
-            padding: 0.65rem 0.85rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-        .contacts-table th, .history-table th, .users-table th {
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.72rem;
-            background: var(--bg-surface-elevated);
-        }
-        .users-table tr:hover {
-            background: var(--bg-surface-hover);
-            cursor: pointer;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
         /* --- Auth Section --- */
         .auth-container {
-            max-width: 420px;
-            margin: 3rem auto;
+            max-width: 440px;
+            margin: 3.5rem auto;
         }
         .auth-card {
             background: var(--bg-surface);
@@ -934,13 +926,14 @@
             font-size: 1.35rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.35rem;
             color: var(--text-primary);
         }
         .auth-form {
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            margin-top: 1.25rem;
         }
         .auth-form input {
             background: var(--bg-surface-elevated);
@@ -950,83 +943,158 @@
             border-radius: 8px;
             font-size: 0.9rem;
             outline: none;
-            transition: all 0.2s ease;
         }
         .auth-form input:focus {
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px var(--brand-subtle);
         }
+
         .btn-auth-primary {
             background: var(--brand-primary);
             color: #FFFFFF;
             border: none;
             padding: 0.8rem;
             border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(120, 13, 43, 0.3);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
-        .btn-auth-primary:hover {
-            filter: brightness(1.1);
-            transform: translateY(-1px);
-        }
-        .auth-link {
-            color: var(--rose-accent);
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: underline;
-            margin-top: 0.85rem;
+        .btn-auth-primary:hover:not(:disabled) {
+            background: var(--brand-hover);
         }
 
-        /* --- Toast Notifications --- */
+        .auth-link {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--rose-accent);
+            cursor: pointer;
+            margin-top: 0.25rem;
+        }
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            color: var(--status-emergency);
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 1.2rem;
+        }
+        .success-msg {
+            color: var(--status-success);
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 1.2rem;
+        }
+
+        /* --- Modals & Forms --- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 10, 13, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+            padding: 1rem;
+        }
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-modal);
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.2rem;
+        }
+        .close-btn:hover {
+            color: var(--status-emergency);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            background: var(--bg-surface-elevated);
+            border: 1px solid var(--border-medium);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px var(--brand-subtle);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem;
+        }
+
+        /* --- Toast --- */
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-medium);
-            color: var(--text-primary);
-            padding: 0.85rem 1.4rem;
+            padding: 0.85rem 1.35rem;
             border-radius: 10px;
-            box-shadow: var(--shadow-modal);
-            z-index: 3000;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            animation: slideInUp 0.25s ease-out;
+            box-shadow: var(--shadow-elevated);
+            z-index: 3000;
+            transition: all 0.2s ease;
+            max-width: 400px;
         }
-        .toast.toast-success {
-            border-left: 4px solid var(--status-success);
+        .toast-info {
+            background: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-medium);
         }
-        .toast.toast-error {
-            border-left: 4px solid var(--status-emergency);
+        .toast-success {
+            background: var(--status-success);
+            color: #FFFFFF;
         }
-        .toast.toast-info {
-            border-left: 4px solid var(--rose-accent);
+        .toast-error {
+            background: var(--status-emergency);
+            color: #FFFFFF;
         }
 
-        @keyframes slideInUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .hidden { display: none !important; }
-        .error-msg { color: var(--status-emergency); font-size: 0.85rem; margin-bottom: 0.85rem; text-align: center; font-weight: 500; }
-        .success-msg { color: var(--status-success); font-size: 0.85rem; margin-bottom: 0.85rem; text-align: center; font-weight: 500; }
-
-        @media (max-width: 1080px) {
-            .operations-layout { grid-template-columns: 1fr; }
-            .container { padding: 1rem; }
-        }
-        @media (max-width: 640px) {
-            header { flex-direction: column; align-items: flex-start; }
-            .header-actions { width: 100%; justify-content: space-between; }
-            .modal-content { padding: 1.25rem; }
-            .stats-overview-grid { grid-template-columns: 1fr 1fr; }
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -1040,13 +1108,16 @@
                         SafeHer Operations
                         <span class="live-ops-pill"><span class="pulse-indicator"></span>Live CAD</span>
                     </h1>
-                    <div class="brand-subtitle">Emergency Response & Incident Dispatch Command</div>
+                    <div class="brand-subtitle">Safety Operations Center &amp; Executive Admin Command</div>
                 </div>
             </div>
 
             <div class="header-actions">
                 <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light/Dark Theme">
                     ☀️ Light Mode
+                </button>
+                <button class="btn-small" onclick="openApiSettingsModal()" title="Backend API Configuration">
+                    ⚙️ API
                 </button>
                 <div id="loggedInUser" class="hidden" style="display: flex; gap: 0.65rem; align-items: center;">
                     <div class="admin-profile-pill">
@@ -1063,12 +1134,18 @@
             <!-- Login Form -->
             <div class="auth-card" id="loginForm">
                 <h2>Admin Command Access</h2>
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 0.75rem;">
+                    Sign in with your master administrator credentials.
+                </div>
                 <div id="loginError" class="error-msg"></div>
                 <div class="auth-form">
-                    <input type="text" id="adminIdInput" placeholder="Administrator ID" required autocomplete="username">
-                    <input type="password" id="passwordInput" placeholder="Password" required autocomplete="current-password">
+                    <input type="text" id="adminIdInput" placeholder="Administrator ID (e.g. admin)" required autocomplete="username">
+                    <input type="password" id="passwordInput" placeholder="Password (e.g. admin123)" required autocomplete="current-password">
                     <button class="btn-auth-primary" onclick="login()" id="loginBtn">Log In to Console</button>
                     <div class="auth-link" onclick="showForm('forgotForm')">Forgot Administrative Password?</div>
+                </div>
+                <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+                    🔒 <strong>Strict Admin Access:</strong> Protected by cryptographic JWT role tokens verified against the backend.
                 </div>
             </div>
 
@@ -1099,54 +1176,87 @@
 
         <!-- Dashboard Content -->
         <div id="dashboardContent" class="hidden">
+            <!-- 5 Operational Navigation Tabs -->
             <div class="tabs">
                 <button class="btn-tab active" id="tab-incidents" onclick="switchTab('incidents')">
-                    🚨 Emergency Incidents & Live Map
+                    🚨 Emergency Incidents &amp; Live Map
+                </button>
+                <button class="btn-tab" id="tab-police" onclick="switchTab('police')">
+                    👮 Police Force Management
+                </button>
+                <button class="btn-tab" id="tab-crime" onclick="switchTab('crime')">
+                    📊 Crime Intelligence &amp; Verification
+                </button>
+                <button class="btn-tab" id="tab-safety" onclick="switchTab('safety')">
+                    🛡️ Safety Advisories &amp; Patrols
                 </button>
                 <button class="btn-tab" id="tab-users" onclick="switchTab('users')">
-                    👥 User Directory & SOS History
+                    👥 Citizen Directory
                 </button>
             </div>
 
-            <!-- Incidents View -->
-            <div id="view-incidents">
-                <!-- Overview Stats Grid -->
-                <div class="stats-overview-grid">
-                    <div class="stat-card" style="border-top-color: var(--brand-primary);">
-                        <div class="stat-card-header">
-                            <span class="stat-title">Total Users</span>
-                            <span class="stat-icon">👥</span>
-                        </div>
-                        <div class="stat-value" id="statUsers">-</div>
-                        <div class="stat-meta">Registered community members</div>
+            <!-- Global Executive 7-Stats Overview Grid -->
+            <div class="stats-overview-grid">
+                <div class="stat-card" style="border-top-color: var(--brand-primary);">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Citizens</span>
+                        <span class="stat-icon">👥</span>
                     </div>
-                    <div class="stat-card" style="border-top-color: var(--status-emergency);">
-                        <div class="stat-card-header">
-                            <span class="stat-title">Active SOS</span>
-                            <span class="stat-icon">🚨</span>
-                        </div>
-                        <div class="stat-value" id="statActive" style="color: var(--status-emergency);">-</div>
-                        <div class="stat-meta" id="statActiveMeta">Awaiting emergency response</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--status-warning);">
-                        <div class="stat-card-header">
-                            <span class="stat-title">In Progress</span>
-                            <span class="stat-icon">⚡</span>
-                        </div>
-                        <div class="stat-value" id="statInProgress" style="color: var(--status-warning);">-</div>
-                        <div class="stat-meta">Under active dispatch</div>
-                    </div>
-                    <div class="stat-card" style="border-top-color: var(--status-success);">
-                        <div class="stat-card-header">
-                            <span class="stat-title">Resolved Incidents</span>
-                            <span class="stat-icon">✓</span>
-                        </div>
-                        <div class="stat-value" id="statResolved" style="color: var(--status-success);">-</div>
-                        <div class="stat-meta">Successfully closed cases</div>
-                    </div>
+                    <div class="stat-value" id="statUsers">-</div>
+                    <div class="stat-meta">Registered community members</div>
                 </div>
+                <div class="stat-card" style="border-top-color: #3B82F6;">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Police Force</span>
+                        <span class="stat-icon">👮</span>
+                    </div>
+                    <div class="stat-value" id="statOfficers" style="color: #3B82F6;">-</div>
+                    <div class="stat-meta" id="statOfficersMeta">0 units ON DUTY</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--status-emergency);">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Pending SOS</span>
+                        <span class="stat-icon">🚨</span>
+                    </div>
+                    <div class="stat-value" id="statActive" style="color: var(--status-emergency);">-</div>
+                    <div class="stat-meta" id="statActiveMeta">Awaiting emergency response</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--status-warning);">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Active Responses</span>
+                        <span class="stat-icon">⚡</span>
+                    </div>
+                    <div class="stat-value" id="statInProgress" style="color: var(--status-warning);">-</div>
+                    <div class="stat-meta">Under active dispatch</div>
+                </div>
+                <div class="stat-card" style="border-top-color: #10B981;">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Patrol Available</span>
+                        <span class="stat-icon">🚔</span>
+                    </div>
+                    <div class="stat-value" id="statPatrolUnits" style="color: #10B981;">-</div>
+                    <div class="stat-meta">Available patrol units</div>
+                </div>
+                <div class="stat-card" style="border-top-color: #8B5CF6;">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Verified Crimes</span>
+                        <span class="stat-icon">🔍</span>
+                    </div>
+                    <div class="stat-value" id="statVerifiedCrimes" style="color: #8B5CF6;">-</div>
+                    <div class="stat-meta">Official community radar</div>
+                </div>
+                <div class="stat-card" style="border-top-color: var(--status-success);">
+                    <div class="stat-card-header">
+                        <span class="stat-title">Resolved Cases</span>
+                        <span class="stat-icon">✓</span>
+                    </div>
+                    <div class="stat-value" id="statResolved" style="color: var(--status-success);">-</div>
+                    <div class="stat-meta">Successfully closed cases</div>
+                </div>
+            </div>
 
-                <!-- Operations Main Split Layout -->
+            <!-- VIEW 1: Incidents & Live Map -->
+            <div id="view-incidents">
                 <div class="operations-layout">
                     <!-- Left: Incident Management Queue -->
                     <div class="panel">
@@ -1210,7 +1320,7 @@
                     <div class="panel">
                         <div class="panel-header">
                             <div class="panel-title">
-                                <span>Situational GPS Tracking</span>
+                                <span>Situational GPS Tracking &amp; Patrols</span>
                             </div>
                             <div style="display: flex; gap: 0.4rem;">
                                 <button class="btn-small" onclick="fitAllMarkers()" title="Fit map to all markers">Fit Markers</button>
@@ -1225,6 +1335,7 @@
                             <div class="legend-item"><span class="legend-dot" style="background: var(--status-emergency);"></span> Active SOS</div>
                             <div class="legend-item"><span class="legend-dot" style="background: var(--status-warning);"></span> In Progress</div>
                             <div class="legend-item"><span class="legend-dot" style="background: var(--status-success);"></span> Resolved</div>
+                            <div class="legend-item"><span class="legend-dot" style="background: #3B82F6;"></span> On-Duty Patrol</div>
                             <div style="font-size: 0.72rem; color: var(--text-muted);">Real-time GPS fixes</div>
                         </div>
 
@@ -1234,38 +1345,339 @@
                                 <span>🛡️ SafeHer Operations Protocol</span>
                             </div>
                             <div style="font-size: 0.78rem; line-height: 1.5; color: var(--text-muted);">
-                                Click any incident card on the left or map marker to view victim emergency contacts, GPS accuracy history, and resolution controls.
+                                Live incidents reflect both mobile and web panic triggers. On-duty police units within a 1–5 km radius receive immediate automated dispatches.
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Users View -->
+            <!-- VIEW 2: Police Force Management -->
+            <div id="view-police" class="hidden">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>👮 Commissioned Police Officers</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-primary" onclick="openCommissionOfficerModal()">+ Commission New Officer</button>
+                            <button class="btn-small" onclick="fetchOfficers()">↻ Refresh Force</button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Badge Number</th>
+                                    <th>Officer Name</th>
+                                    <th>Rank &amp; Role</th>
+                                    <th>Station &amp; Sector</th>
+                                    <th>Duty Status</th>
+                                    <th>Account Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="policeTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading commissioned police officers...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: Crime Intelligence & Verification -->
+            <div id="view-crime" class="hidden">
+                <!-- High-Risk Crime Concentration Cards -->
+                <div class="panel" style="margin-bottom: 1.5rem;">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>📍 High-Risk Locality Crime Concentration</span>
+                        </div>
+                        <button class="btn-small" onclick="exportWeeklyCrimeReport()">📥 Export Weekly Report (HTML)</button>
+                    </div>
+                    <div class="crime-rankings-grid" id="crimeRankingsGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Crime Reports Audit & Verification Table -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>🔍 Crime Reports &amp; Community Verification</span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <input type="text" id="crimeLocalityFilter" placeholder="Filter locality..." oninput="handleCrimeSearchInput()" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-medium); background: var(--bg-surface-elevated); color: var(--text-primary); font-size: 0.8rem;">
+                            <select id="crimeVerifiedFilter" onchange="fetchCrimeReports()" style="padding: 0.4rem 1.8rem 0.4rem 0.65rem; font-size: 0.8rem;">
+                                <option value="ALL">All Reports</option>
+                                <option value="VERIFIED">Verified Only</option>
+                                <option value="UNVERIFIED">Unverified Only</option>
+                            </select>
+                            <button class="btn-small" onclick="fetchCrimeReports()">↻ Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    <th>Locality / City</th>
+                                    <th>Trigger Source</th>
+                                    <th>Date &amp; Time</th>
+                                    <th>Verification</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crimeTableBody">
+                                <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading crime intelligence records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 4: Safety Advisories & Patrol Recommendations -->
+            <div id="view-safety" class="hidden">
+                <div class="operations-layout">
+                    <!-- Left: Community Safety Advisories -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <span>📢 Official Safety Advisories</span>
+                            </div>
+                            <button class="btn-primary" onclick="openBroadcastAdvisoryModal()">+ Broadcast Advisory</button>
+                        </div>
+
+                        <div class="data-table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title &amp; Locality</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="advisoriesTableBody">
+                                    <tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading safety advisories...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Right: Automated Patrol Recommendations -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <span>🚔 AI Patrol Deployment Recommendations</span>
+                            </div>
+                            <button class="btn-small" onclick="fetchPatrolRecommendations()">↻ Refresh</button>
+                        </div>
+
+                        <div id="patrolRecommendationsList" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 5: Users Directory -->
             <div id="view-users" class="hidden">
                 <div class="panel">
                     <div class="panel-header">
                         <div class="panel-title">
-                            <span>User Directory</span>
+                            <span>👥 Citizen Directory</span>
                         </div>
-                        <button class="btn-small" onclick="fetchUsers()">↻ Refresh Users</button>
+                        <button class="btn-small" onclick="fetchUsers()">↻ Refresh Citizens</button>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="users-table">
+                    <div class="data-table-wrap">
+                        <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Joined</th>
-                                    <th>Incidents (Active/Total)</th>
+                                    <th>Incidents (Active / Total)</th>
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
-                                <!-- Populated by JS -->
+                                <tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading citizen directory...</td></tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commission Police Officer Modal -->
+        <div id="commissionOfficerModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 style="font-size: 1.25rem;">Commission New Police Officer</h2>
+                    <button class="close-btn" onclick="closeCommissionOfficerModal()">&times;</button>
+                </div>
+                <form id="commissionOfficerForm" onsubmit="handleCommissionOfficerSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Badge Number *</label>
+                            <input type="text" id="officerBadge" class="form-input" placeholder="e.g. POL-105" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Officer Name *</label>
+                            <input type="text" id="officerName" class="form-input" placeholder="e.g. Rajesh Kumar" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Department Email *</label>
+                            <input type="email" id="officerEmail" class="form-input" placeholder="officer@police.gov.in" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Password *</label>
+                            <input type="password" id="officerPassword" class="form-input" placeholder="Min 6 characters" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Rank *</label>
+                            <input type="text" id="officerRank" class="form-input" placeholder="e.g. Sub-Inspector" value="Sub-Inspector" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role *</label>
+                            <select id="officerRole" class="form-select">
+                                <option value="OFFICER">OFFICER (Field Responder)</option>
+                                <option value="SUPERVISOR">SUPERVISOR (Dispatch Lead)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Station Name *</label>
+                            <input type="text" id="officerStation" class="form-input" placeholder="e.g. Central Police Station" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Assigned Patrol Zone *</label>
+                            <input type="text" id="officerZone" class="form-input" placeholder="e.g. Koramangala Sector 4" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Direct Phone</label>
+                        <input type="text" id="officerPhone" class="form-input" placeholder="+91 98765 43210">
+                    </div>
+                    <div id="commissionError" class="error-msg" style="text-align: left; margin-bottom: 0.75rem;"></div>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button type="button" class="btn-small" onclick="closeCommissionOfficerModal()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="commissionSubmitBtn">Commission Officer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Broadcast Safety Advisory Modal -->
+        <div id="broadcastAdvisoryModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 style="font-size: 1.25rem;">Broadcast Community Safety Advisory</h2>
+                    <button class="close-btn" onclick="closeBroadcastAdvisoryModal()">&times;</button>
+                </div>
+                <form id="broadcastAdvisoryForm" onsubmit="handleBroadcastAdvisorySubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Target Locality *</label>
+                            <input type="text" id="advisoryLocality" class="form-input" placeholder="e.g. Koramangala or Citywide" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Severity Level *</label>
+                            <select id="advisorySeverity" class="form-select">
+                                <option value="ADVISORY">ADVISORY (General Notice)</option>
+                                <option value="WARNING">WARNING (Elevated Risk)</option>
+                                <option value="CRITICAL">CRITICAL (Immediate Threat)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Advisory Headline *</label>
+                        <input type="text" id="advisoryTitle" class="form-input" placeholder="e.g. Increased Night Patrols in 5th Block" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Detailed Advisory Message *</label>
+                        <textarea id="advisoryMessage" class="form-textarea" rows="3" placeholder="Provide actionable safety information for citizens..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Recommended Precautions</label>
+                        <textarea id="advisoryPrecautions" class="form-textarea" rows="2" placeholder="e.g. Use well-lit main corridors after 10 PM."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Issuing Authority</label>
+                            <input type="text" id="advisoryAuthority" class="form-input" value="SafeHer Emergency Administration" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active Period (Days)</label>
+                            <input type="number" id="advisoryDays" class="form-input" value="7" min="1" max="60">
+                        </div>
+                    </div>
+                    <div id="advisoryError" class="error-msg" style="text-align: left; margin-bottom: 0.75rem;"></div>
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button type="button" class="btn-small" onclick="closeBroadcastAdvisoryModal()">Cancel</button>
+                        <button type="submit" class="btn-primary" id="broadcastSubmitBtn">Publish Advisory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Approve Patrol Deployment Modal -->
+        <div id="approvePatrolModal" class="modal hidden">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2 style="font-size: 1.25rem;">Approve Area Patrol Deployment</h2>
+                    <button class="close-btn" onclick="closeApprovePatrolModal()">&times;</button>
+                </div>
+                <div style="margin-bottom: 1.25rem;">
+                    <p style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+                        Deploy active patrol reinforcement to <strong id="approvePatrolLocality">Sector</strong>.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label">Assign Available On-Duty Officer (Optional)</label>
+                        <select id="assignOfficerSelect" class="form-select">
+                            <option value="">-- Auto-assign nearest available patrol --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Supervisor Deployment Instructions</label>
+                        <input type="text" id="patrolInstructions" class="form-input" placeholder="e.g. Focus on dimly lit areas and transit stops" value="Reinforce active patrol presence and surveillance">
+                    </div>
+                </div>
+                <div id="approvePatrolError" class="error-msg" style="text-align: left; margin-bottom: 0.75rem;"></div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" class="btn-small" onclick="closeApprovePatrolModal()">Cancel</button>
+                    <button type="button" class="btn-success" id="confirmApprovePatrolBtn" onclick="executeApprovePatrol()">Confirm Deployment</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Settings Modal -->
+        <div id="apiSettingsModal" class="modal hidden">
+            <div class="modal-content" style="max-width: 480px;">
+                <div class="modal-header">
+                    <h2 style="font-size: 1.2rem;">Backend API Settings</h2>
+                    <button class="close-btn" onclick="closeApiSettingsModal()">&times;</button>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label">Current API Endpoint</label>
+                    <input type="text" id="apiEndpointInput" class="form-input" placeholder="http://localhost:8000 or https://..." required>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem;">
+                        Default Production: <code>https://women-safety-app-xo2h.onrender.com</code><br>
+                        Local Development: <code>http://localhost:8000</code>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button class="btn-small" onclick="closeApiSettingsModal()">Cancel</button>
+                    <button class="btn-primary" onclick="saveApiSettings()">Save &amp; Reload</button>
                 </div>
             </div>
         </div>
@@ -1274,7 +1686,7 @@
         <div id="userModal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 style="font-size: 1.25rem;">User Details</h2>
+                    <h2 style="font-size: 1.25rem;">Citizen Profile &amp; Emergency Contacts</h2>
                     <button class="close-btn" onclick="document.getElementById('userModal').classList.add('hidden')">&times;</button>
                 </div>
                 <div id="userDetailsContent">Loading...</div>
@@ -1338,12 +1750,9 @@
                         Are you sure you want to mark <strong id="bulkResolveCountText" style="color: var(--status-emergency);">0</strong> unresolved incident(s) as <span class="status-badge status-RESOLVED" style="padding: 0.15rem 0.5rem; font-size: 0.75rem;">RESOLVED</span>?
                     </p>
                     <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.95rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
-                        <div>• <strong>Scope:</strong> Resolves <em>ALL</em> currently unresolved incidents in the database, regardless of active filter or search.</div>
-                        <div>• <strong>Audit Record:</strong> Sets status to RESOLVED, saves resolution timestamp, and records admin (<strong id="bulkResolveAdminEmail" style="color: var(--text-primary);">admin</strong>).</div>
-                        <div>• <strong>History Safe:</strong> Retains all SOS messages, victim details, and GPS coordinates. Previously resolved incidents are untouched.</div>
-                        <div style="margin-top: 0.5rem; color: var(--status-warning); font-size: 0.78rem;">
-                            ⚠️ <em>Note: This action records administrative resolution in the database and does not dispatch responders or contact emergency contacts.</em>
-                        </div>
+                        <div>• <strong>Scope:</strong> Resolves <em>ALL</em> currently unresolved incidents in the database.</div>
+                        <div>• <strong>Audit Record:</strong> Sets status to RESOLVED, stamps resolution timestamp, and records admin (<strong id="bulkResolveAdminEmail" style="color: var(--text-primary);">admin</strong>).</div>
+                        <div>• <strong>History Safe:</strong> Retains all SOS messages, victim details, and GPS coordinates.</div>
                     </div>
                 </div>
                 <div id="resolveAllModalError" class="error-msg" style="text-align: left;"></div>
@@ -1361,15 +1770,37 @@
     </div>
 
     <script>
-        const API_URL = 'https://women-safety-app-xo2h.onrender.com';
+        // --- API URL Resolution ---
+        function getApiUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlParamApi = urlParams.get('api');
+            if (urlParamApi) {
+                localStorage.setItem('safeher_admin_api_url', urlParamApi);
+                return urlParamApi;
+            }
+            const savedApi = localStorage.getItem('safeher_admin_api_url');
+            if (savedApi) return savedApi;
+
+            if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                return 'http://localhost:8000';
+            }
+            return 'https://women-safety-app-xo2h.onrender.com';
+        }
+
+        const API_URL = getApiUrl();
         
         let map;
         let markers = [];
         let allIncidents = [];
+        let allOfficers = [];
+        let allCrimeReports = [];
+        let allAdvisories = [];
+        let allPatrolRecs = [];
         let currentResetToken = null;
         let currentAdmin = null;
         let pendingResolveIncidentId = null;
         let activeModalIncidentId = null;
+        let pendingApprovePatrolId = null;
         let toastTimeout = null;
 
         // Routing logic based on URL params
@@ -1417,13 +1848,32 @@
             setTheme(next);
         }
 
+        function openApiSettingsModal() {
+            const modal = document.getElementById('apiSettingsModal');
+            const input = document.getElementById('apiEndpointInput');
+            if (input) input.value = API_URL;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeApiSettingsModal() {
+            const modal = document.getElementById('apiSettingsModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function saveApiSettings() {
+            const input = document.getElementById('apiEndpointInput');
+            if (!input || !input.value.trim()) return;
+            const val = input.value.trim().replace(/\/+$/, '');
+            localStorage.setItem('safeher_admin_api_url', val);
+            window.location.reload();
+        }
+
         function showForm(formId) {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('forgotForm').classList.add('hidden');
             document.getElementById('resetForm').classList.add('hidden');
             document.getElementById(formId).classList.remove('hidden');
             
-            // clear messages
             document.querySelectorAll('.error-msg').forEach(el => el.innerText = '');
             document.querySelectorAll('.success-msg').forEach(el => el.innerText = '');
         }
@@ -1453,7 +1903,7 @@
                 
                 const data = await res.json();
                 if (!res.ok) {
-                    throw new Error(data.detail || "Authentication failed");
+                    throw new Error(data.detail || "Authentication failed. Ensure valid Administrator credentials.");
                 }
                 
                 localStorage.setItem('adminToken', data.access_token);
@@ -1541,26 +1991,999 @@
 
         // --- Tabs Navigation ---
         function switchTab(tab) {
-            document.getElementById('view-incidents').classList.add('hidden');
-            document.getElementById('view-users').classList.add('hidden');
-            document.getElementById('tab-incidents').classList.remove('active');
-            document.getElementById('tab-users').classList.remove('active');
+            ['incidents', 'police', 'crime', 'safety', 'users'].forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const tabBtn = document.getElementById(`tab-${t}`);
+                if (view) view.classList.add('hidden');
+                if (tabBtn) tabBtn.classList.remove('active');
+            });
             
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            const activeView = document.getElementById(`view-${tab}`);
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeBtn) activeBtn.classList.add('active');
             
-            if (tab === 'users') {
+            if (tab === 'incidents') {
+                if (map) setTimeout(() => map.invalidateSize(), 150);
+            } else if (tab === 'police') {
+                fetchOfficers();
+            } else if (tab === 'crime') {
+                fetchCrimeReports();
+            } else if (tab === 'safety') {
+                fetchSafetyAdvisories();
+                fetchPatrolRecommendations();
+            } else if (tab === 'users') {
                 fetchUsers();
-            } else if (tab === 'incidents') {
-                if (map) setTimeout(() => map.invalidateSize(), 100);
             }
         }
 
-        // --- User Directory Operations ---
+        // --- Dashboard Initialization ---
+        async function loadDashboard(token) {
+            document.getElementById('authContainer').classList.add('hidden');
+            document.getElementById('dashboardContent').classList.remove('hidden');
+            document.getElementById('loggedInUser').classList.remove('hidden');
+
+            try {
+                const adminRes = await fetch(`${API_URL}/admin/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (adminRes.ok) {
+                    currentAdmin = await adminRes.json();
+                    document.getElementById('userEmailBadge').innerText = currentAdmin.email || currentAdmin.admin_id;
+                } else if (adminRes.status === 401 || adminRes.status === 403) {
+                    logout();
+                    return;
+                }
+            } catch (e) {
+                console.warn("Admin profile fetch notice:", e);
+            }
+
+            initMap();
+            loadComprehensiveStats(token);
+            fetchIncidents(false, token);
+        }
+
+        async function loadComprehensiveStats(token = localStorage.getItem('adminToken')) {
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_URL}/admin/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                const stats = await res.json();
+
+                const elUsers = document.getElementById('statUsers');
+                const elOfficers = document.getElementById('statOfficers');
+                const elOfficersMeta = document.getElementById('statOfficersMeta');
+                const elActive = document.getElementById('statActive');
+                const elActiveMeta = document.getElementById('statActiveMeta');
+                const elInProgress = document.getElementById('statInProgress');
+                const elPatrol = document.getElementById('statPatrolUnits');
+                const elVerified = document.getElementById('statVerifiedCrimes');
+                const elResolved = document.getElementById('statResolved');
+
+                if (elUsers) elUsers.innerText = stats.total_users ?? 0;
+                if (elOfficers) elOfficers.innerText = stats.total_officers ?? 0;
+                if (elOfficersMeta) elOfficersMeta.innerText = `${stats.on_duty_officers ?? 0} units ON DUTY`;
+                if (elActive) {
+                    elActive.innerText = stats.pending_incidents ?? 0;
+                    if (elActiveMeta) {
+                        elActiveMeta.innerText = (stats.pending_incidents > 0) ? "Immediate attention required" : "No active SOS alerts";
+                    }
+                }
+                if (elInProgress) elInProgress.innerText = stats.active_responses ?? 0;
+                if (elPatrol) elPatrol.innerText = stats.patrol_units_available ?? 0;
+                if (elVerified) elVerified.innerText = stats.verified_crime_reports ?? 0;
+                if (elResolved) elResolved.innerText = stats.resolved_incidents ?? 0;
+
+                // Render Top Locality Crime Rankings
+                renderCrimeRankings(stats.locality_crime_rankings || []);
+            } catch (err) {
+                console.warn("Comprehensive stats error:", err);
+            }
+        }
+
+        function renderCrimeRankings(rankings) {
+            const grid = document.getElementById('crimeRankingsGrid');
+            if (!grid) return;
+            if (rankings.length === 0) {
+                grid.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 1rem;">No concentrated high-risk sectors identified.</div>';
+                return;
+            }
+            grid.innerHTML = rankings.slice(0, 6).map(r => `
+                <div class="ranking-card risk-${r.risk_level}">
+                    <div class="ranking-locality">${escapeHtml(r.locality)}</div>
+                    <div class="ranking-stats">
+                        <span><strong>${r.count}</strong> Incidents</span>
+                        <span class="badge ${r.risk_level === 'HIGH' ? 'badge-danger' : r.risk_level === 'MODERATE' ? 'badge-warning' : 'badge-verified'}">${r.risk_level} RISK</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Incidents & Map ---
+        async function fetchIncidents(isManual = false, token = localStorage.getItem('adminToken')) {
+            if (!token) return;
+            const list = document.getElementById('incidentList');
+            const refreshBtn = document.getElementById('refreshIncidentsBtn');
+
+            if (isManual && refreshBtn) {
+                refreshBtn.innerText = "↻ Refreshing...";
+                refreshBtn.disabled = true;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/admin/incidents`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        logout();
+                        throw new Error("Session expired. Please log in again.");
+                    }
+                    throw new Error(`Failed to fetch incidents (HTTP ${response.status})`);
+                }
+                
+                allIncidents = await response.json();
+                applyFilters();
+                if (isManual) showToast("Incidents refreshed", "success");
+            } catch (err) {
+                console.error(err);
+                if (list) {
+                    list.innerHTML = `
+                        <div style="text-align:center; padding: 2rem; color: var(--status-emergency);">
+                            Failed to load incidents: ${escapeHtml(err.message)}
+                        </div>
+                    `;
+                }
+            } finally {
+                if (refreshBtn) {
+                    refreshBtn.innerText = "↻ Refresh";
+                    refreshBtn.disabled = false;
+                }
+            }
+        }
+
+        function initMap() {
+            if (map) return;
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) return;
+
+            map = L.map('map', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([12.9716, 77.5946], 12); // Default Bengaluru Center
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        function fitAllMarkers() {
+            if (!map || markers.length === 0) {
+                if (map) map.setView([12.9716, 77.5946], 12);
+                return;
+            }
+            const bounds = markers.map(m => m.getLatLng());
+            if (bounds.length === 1) {
+                map.setView(bounds[0], 14);
+            } else {
+                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+            }
+        }
+
+        function handleSearchInput() {
+            const val = document.getElementById('incidentSearchInput')?.value || '';
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) {
+                if (val.trim().length > 0) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+            applyFilters();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('incidentSearchInput');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            applyFilters();
+        }
+
+        function handleStatusSelectChange() {
+            const select = document.getElementById('statusFilter');
+            if (select) setStatusFilter(select.value);
+        }
+
+        function setStatusFilter(status) {
+            const select = document.getElementById('statusFilter');
+            if (select) select.value = status;
+            
+            document.querySelectorAll('.status-pill').forEach(pill => pill.classList.remove('active'));
+            const targetPill = document.getElementById(`pill-${status}`);
+            if (targetPill) targetPill.classList.add('active');
+            
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchTerm = (document.getElementById('incidentSearchInput')?.value || '').trim().toLowerCase();
+            const statusFilter = document.getElementById('statusFilter')?.value || 'ALL';
+
+            // Counts
+            let countAll = allIncidents.length;
+            let countActive = 0;
+            let countInProgress = 0;
+            let countResolved = 0;
+
+            allIncidents.forEach(inc => {
+                const s = (inc.status || '').toUpperCase();
+                if (s === 'ACTIVE') countActive++;
+                else if (s === 'IN_PROGRESS' || s === 'ACKNOWLEDGED' || s === 'DISPATCHED' || s === 'EN_ROUTE' || s === 'ON_SCENE') countInProgress++;
+                else if (s === 'RESOLVED') countResolved++;
+            });
+
+            document.getElementById('count-ALL').innerText = countAll;
+            document.getElementById('count-ACTIVE').innerText = countActive;
+            document.getElementById('count-IN_PROGRESS').innerText = countInProgress;
+            document.getElementById('count-RESOLVED').innerText = countResolved;
+
+            const unresolvedCount = countActive + countInProgress;
+            const resolveAllBtn = document.getElementById('resolveAllBtn');
+            if (resolveAllBtn) {
+                resolveAllBtn.innerText = `✓✓ Resolve All (${unresolvedCount})`;
+                resolveAllBtn.disabled = unresolvedCount === 0;
+            }
+
+            const filtered = allIncidents.filter(inc => {
+                const s = (inc.status || '').toUpperCase();
+                if (statusFilter === 'ACTIVE' && s !== 'ACTIVE') return false;
+                if (statusFilter === 'IN_PROGRESS' && (s !== 'IN_PROGRESS' && s !== 'ACKNOWLEDGED' && s !== 'DISPATCHED' && s !== 'EN_ROUTE' && s !== 'ON_SCENE')) return false;
+                if (statusFilter === 'RESOLVED' && s !== 'RESOLVED') return false;
+
+                if (searchTerm) {
+                    const idStr = String(inc.id);
+                    const name = (inc.user_name || inc.user?.name || '').toLowerCase();
+                    const email = (inc.user_email || inc.user?.email || '').toLowerCase();
+                    const phone = (inc.user_phone || inc.user?.phone || '').toLowerCase();
+                    const type = (inc.type || '').toLowerCase();
+                    const loc = (inc.locality || '').toLowerCase();
+                    if (!idStr.includes(searchTerm) && !name.includes(searchTerm) && !email.includes(searchTerm) && !phone.includes(searchTerm) && !type.includes(searchTerm) && !loc.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            renderIncidentList(filtered);
+            updateMapMarkers(filtered);
+        }
+
+        function renderIncidentList(incidents) {
+            const list = document.getElementById('incidentList');
+            if (!list) return;
+
+            document.getElementById('incidentCountBadge').innerText = `${incidents.length} of ${allIncidents.length} incidents`;
+
+            if (incidents.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                        <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">🛡️</div>
+                        <div style="font-weight: 600;">No incidents match active criteria</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = incidents.map(inc => {
+                const status = (inc.status || 'ACTIVE').toUpperCase();
+                const userName = inc.user_name || inc.user?.name || 'Anonymous Civilian';
+                const userPhone = inc.user_phone || inc.user?.phone || 'No phone recorded';
+                const assignedOfficer = inc.assigned_officer_badge ? `Officer ${inc.assigned_officer_badge}` : 'Unassigned';
+                const dispatchStatus = inc.dispatch_status || 'UNASSIGNED';
+                const isResolved = status === 'RESOLVED';
+
+                return `
+                    <div class="incident-card status-${status}" id="inc-card-${inc.id}" onclick="focusIncidentOnMap(${inc.id})">
+                        <div class="incident-card-header">
+                            <span class="incident-id-badge">#INC-${inc.id} • ${escapeHtml(inc.type || 'SOS Emergency')}</span>
+                            <span class="status-badge status-${status}">${status}</span>
+                        </div>
+                        <div class="incident-victim-name">${escapeHtml(userName)}</div>
+                        <div class="incident-meta-row">
+                            <span>📞 ${escapeHtml(userPhone)}</span>
+                            <span>📍 ${escapeHtml(inc.locality || inc.city || 'Coordinates available')}</span>
+                            <span>👮 ${escapeHtml(assignedOfficer)} (${escapeHtml(dispatchStatus)})</span>
+                            <span>⏰ ${formatDate(inc.start_time)}</span>
+                        </div>
+                        <div class="incident-actions-row" onclick="event.stopPropagation()">
+                            <span style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">Source: ${escapeHtml(inc.trigger_source || 'MANUAL')}</span>
+                            <div style="display: flex; gap: 0.4rem;">
+                                <button class="btn-view" onclick="openIncidentModal(${inc.id})">Details</button>
+                                ${!isResolved ? `<button class="btn-resolve" onclick="openResolveModal(${inc.id})">✓ Resolve</button>` : `<span style="font-size: 0.75rem; color: var(--status-success); font-weight: 600;">✓ Resolved</span>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateMapMarkers(incidents) {
+            if (!map) return;
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            incidents.forEach(inc => {
+                let lat, lng;
+                if (inc.locations && inc.locations.length > 0) {
+                    const lastLoc = inc.locations[inc.locations.length - 1];
+                    lat = lastLoc.latitude;
+                    lng = lastLoc.longitude;
+                } else if (inc.latitude && inc.longitude) {
+                    lat = inc.latitude;
+                    lng = inc.longitude;
+                }
+                if (lat && lng) {
+                    const status = (inc.status || 'ACTIVE').toUpperCase();
+                    const color = status === 'RESOLVED' ? '#059669' : status === 'ACTIVE' ? '#E11D48' : '#D97706';
+                    
+                    const marker = L.circleMarker([lat, lng], {
+                        radius: 8,
+                        fillColor: color,
+                        color: '#FFFFFF',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.85
+                    }).addTo(map);
+
+                    marker.bindPopup(`
+                        <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
+                            <strong>Incident #${inc.id}</strong> (${escapeHtml(inc.type || 'SOS')})<br>
+                            Status: <b>${status}</b><br>
+                            Victim: ${escapeHtml(inc.user_name || inc.user?.name || 'Civilian')}<br>
+                            Phone: ${escapeHtml(inc.user_phone || inc.user?.phone || 'N/A')}<br>
+                            Locality: ${escapeHtml(inc.locality || 'GPS Location')}<br>
+                            <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color: #2563EB; font-weight: bold; margin-top: 4px; display: inline-block;">Open GPS in Google Maps ↗</a>
+                        </div>
+                    `);
+                    markers.push(marker);
+                }
+            });
+        }
+
+        function focusIncidentOnMap(incidentId) {
+            const inc = allIncidents.find(i => i.id === incidentId);
+            if (!inc) return;
+            let lat, lng;
+            if (inc.locations && inc.locations.length > 0) {
+                lat = inc.locations[inc.locations.length - 1].latitude;
+                lng = inc.locations[inc.locations.length - 1].longitude;
+            } else if (inc.latitude && inc.longitude) {
+                lat = inc.latitude;
+                lng = inc.longitude;
+            }
+            if (lat && lng && map) {
+                map.setView([lat, lng], 16);
+            }
+        }
+
+        // --- Single & Bulk Resolve Operations ---
+        function openResolveModal(incidentId) {
+            pendingResolveIncidentId = incidentId;
+            const modal = document.getElementById('resolveConfirmModal');
+            const adminEmailSpan = document.getElementById('resolveAdminEmail');
+            if (adminEmailSpan && currentAdmin) {
+                adminEmailSpan.innerText = currentAdmin.email || currentAdmin.admin_id;
+            }
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeResolveModal() {
+            pendingResolveIncidentId = null;
+            const modal = document.getElementById('resolveConfirmModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function executeResolveIncident() {
+            if (!pendingResolveIncidentId) return;
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById('confirmResolveBtn');
+            const err = document.getElementById('resolveModalError');
+            if (btn) { btn.innerText = "Resolving..."; btn.disabled = true; }
+            if (err) err.innerText = "";
+
+            try {
+                const res = await fetch(`${API_URL}/admin/incidents/${pendingResolveIncidentId}/resolve`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.detail || `Failed to resolve incident (${res.status})`);
+                }
+                closeResolveModal();
+                showToast(`Incident #${pendingResolveIncidentId} successfully marked RESOLVED`, "success");
+                await fetchIncidents();
+                await loadComprehensiveStats();
+            } catch (e) {
+                if (err) err.innerText = e.message;
+            } finally {
+                if (btn) { btn.innerText = "Confirm Resolution"; btn.disabled = false; }
+            }
+        }
+
+        function openResolveAllModal() {
+            const modal = document.getElementById('resolveAllModal');
+            const countText = document.getElementById('bulkResolveCountText');
+            const adminSpan = document.getElementById('bulkResolveAdminEmail');
+            let unresolved = allIncidents.filter(i => (i.status || '').toUpperCase() !== 'RESOLVED').length;
+            if (countText) countText.innerText = unresolved;
+            if (adminSpan && currentAdmin) adminSpan.innerText = currentAdmin.email || currentAdmin.admin_id;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeResolveAllModal() {
+            const modal = document.getElementById('resolveAllModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function executeResolveAllIncidents() {
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById('confirmResolveAllBtn');
+            const err = document.getElementById('resolveAllModalError');
+            if (btn) { btn.innerText = "Resolving All..."; btn.disabled = true; }
+            if (err) err.innerText = "";
+
+            try {
+                const res = await fetch(`${API_URL}/admin/incidents/resolve-all`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    throw new Error(data.detail || `Failed bulk resolution (${res.status})`);
+                }
+                closeResolveAllModal();
+                showToast("All open incidents marked RESOLVED", "success");
+                await fetchIncidents();
+                await loadComprehensiveStats();
+            } catch (e) {
+                if (err) err.innerText = e.message;
+            } finally {
+                if (btn) { btn.innerText = "Confirm Bulk Resolution"; btn.disabled = false; }
+            }
+        }
+
+        async function openIncidentModal(incidentId) {
+            const modal = document.getElementById('incidentModal');
+            const title = document.getElementById('incidentModalTitle');
+            const subtitle = document.getElementById('incidentModalSubtitle');
+            const content = document.getElementById('incidentDetailContent');
+            if (modal) modal.classList.remove('hidden');
+            if (content) content.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-muted);">Loading incident details...</div>';
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const res = await fetch(`${API_URL}/admin/incidents/${incidentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Incident not found");
+                const inc = await res.json();
+
+                if (title) title.innerText = `Incident #INC-${inc.id}`;
+                if (subtitle) subtitle.innerText = `${inc.type || 'SOS Emergency'} • Started: ${formatDate(inc.start_time)}`;
+
+                let locHtml = '<p style="color: var(--text-muted); font-size: 0.8rem;">No GPS breadcrumbs logged.</p>';
+                if (inc.locations && inc.locations.length > 0) {
+                    locHtml = `
+                        <div style="overflow-x: auto; max-height: 180px; overflow-y: auto;">
+                            <table class="data-table" style="font-size: 0.78rem;">
+                                <thead>
+                                    <tr><th>Time</th><th>Lat, Lng</th><th>Accuracy</th><th>Maps</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${inc.locations.map(l => `
+                                        <tr>
+                                            <td>${formatDate(l.timestamp)}</td>
+                                            <td style="font-family: monospace;">${l.latitude.toFixed(5)}, ${l.longitude.toFixed(5)}</td>
+                                            <td>±${Math.round(l.accuracy || 0)}m</td>
+                                            <td><a href="https://www.google.com/maps?q=${l.latitude},${l.longitude}" target="_blank" style="color: #2563EB;">View ↗</a></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+
+                if (content) {
+                    content.innerHTML = `
+                        <div class="form-row" style="margin-bottom: 1rem;">
+                            <div class="stat-card" style="padding: 0.85rem;">
+                                <div class="stat-title">Victim</div>
+                                <div style="font-size: 1rem; font-weight: 700;">${escapeHtml(inc.user_name || inc.user?.name || 'Civilian')}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(inc.user_phone || inc.user?.phone || 'No phone')}</div>
+                            </div>
+                            <div class="stat-card" style="padding: 0.85rem;">
+                                <div class="stat-title">Assigned Responder</div>
+                                <div style="font-size: 1rem; font-weight: 700; color: #3B82F6;">${escapeHtml(inc.assigned_officer_badge || 'Unassigned')}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">${escapeHtml(inc.dispatch_status || 'PENDING')}</div>
+                            </div>
+                        </div>
+                        <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">GPS Telemetry History</h4>
+                        ${locHtml}
+                    `;
+                }
+            } catch (e) {
+                if (content) content.innerHTML = `<div style="color: var(--status-emergency); padding: 1.5rem;">Error: ${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        function closeIncidentModal() {
+            const modal = document.getElementById('incidentModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // --- VIEW 2: Police Force Operations ---
+        async function fetchOfficers() {
+            const token = localStorage.getItem('adminToken');
+            const tbody = document.getElementById('policeTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading commissioned police officers...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/officers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error(`Failed to load officers (${res.status})`);
+                allOfficers = await res.json();
+
+                if (allOfficers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No officers commissioned. Click "+ Commission New Officer" above.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = allOfficers.map(off => `
+                    <tr>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">${escapeHtml(off.badge_number)}</td>
+                        <td>
+                            <strong>${escapeHtml(off.name)}</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(off.phone || off.email)}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600;">${escapeHtml(off.rank)}</span><br>
+                            <span style="font-size: 0.72rem; color: var(--text-muted);">${escapeHtml(off.role)}</span>
+                        </td>
+                        <td>
+                            ${escapeHtml(off.station_name)}<br>
+                            <span style="font-size: 0.75rem; color: #B23A5B;">${escapeHtml(off.assigned_zone)}</span>
+                        </td>
+                        <td>
+                            <span class="badge ${off.is_on_duty ? 'badge-onduty' : 'badge-offduty'}">
+                                ${off.is_on_duty ? '● ON DUTY' : '○ OFF DUTY'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${off.is_active ? 'badge-active' : 'badge-deactivated'}">
+                                ${off.is_active ? 'ACTIVE' : 'DEACTIVATED'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-small" onclick="toggleOfficerStatus(${off.id}, ${!off.is_active})" style="font-size: 0.72rem;">
+                                ${off.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Populate officer select for patrol modal
+                const select = document.getElementById('assignOfficerSelect');
+                if (select) {
+                    const onDuty = allOfficers.filter(o => o.is_on_duty && o.is_active);
+                    select.innerHTML = '<option value="">-- Auto-assign nearest available patrol --</option>' + 
+                        onDuty.map(o => `<option value="${o.id}">${escapeHtml(o.badge_number)} - ${escapeHtml(o.name)} (${escapeHtml(o.station_name)})</option>`).join('');
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--status-emergency);">Error: ${escapeHtml(e.message)}</td></tr>`;
+            }
+        }
+
+        function openCommissionOfficerModal() {
+            const modal = document.getElementById('commissionOfficerModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeCommissionOfficerModal() {
+            const modal = document.getElementById('commissionOfficerModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleCommissionOfficerSubmit(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById('commissionSubmitBtn');
+            const err = document.getElementById('commissionError');
+            if (btn) { btn.innerText = "Commissioning..."; btn.disabled = true; }
+            if (err) err.innerText = "";
+
+            const payload = {
+                badge_number: document.getElementById('officerBadge').value.trim(),
+                name: document.getElementById('officerName').value.trim(),
+                email: document.getElementById('officerEmail').value.trim(),
+                password: document.getElementById('officerPassword').value,
+                rank: document.getElementById('officerRank').value.trim(),
+                role: document.getElementById('officerRole').value,
+                station_name: document.getElementById('officerStation').value.trim(),
+                assigned_zone: document.getElementById('officerZone').value.trim(),
+                phone: document.getElementById('officerPhone').value.trim() || undefined
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/admin/officers`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Failed to commission officer");
+
+                closeCommissionOfficerModal();
+                showToast(`Officer ${payload.badge_number} successfully commissioned!`, "success");
+                document.getElementById('commissionOfficerForm').reset();
+                await fetchOfficers();
+                await loadComprehensiveStats();
+            } catch (e) {
+                if (err) err.innerText = e.message;
+            } finally {
+                if (btn) { btn.innerText = "Commission Officer"; btn.disabled = false; }
+            }
+        }
+
+        async function toggleOfficerStatus(officerId, newStatus) {
+            const token = localStorage.getItem('adminToken');
+            try {
+                const res = await fetch(`${API_URL}/admin/officers/${officerId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                if (!res.ok) throw new Error("Failed to update status");
+                showToast(`Officer status updated to ${newStatus ? 'ACTIVE' : 'DEACTIVATED'}`, "success");
+                await fetchOfficers();
+                await loadComprehensiveStats();
+            } catch (e) {
+                showToast(`Failed: ${e.message}`, "error");
+            }
+        }
+
+        // --- VIEW 3: Crime Intelligence & Verification ---
+        function handleCrimeSearchInput() {
+            fetchCrimeReports();
+        }
+
+        async function fetchCrimeReports() {
+            const token = localStorage.getItem('adminToken');
+            const tbody = document.getElementById('crimeTableBody');
+            if (!tbody) return;
+
+            const locality = (document.getElementById('crimeLocalityFilter')?.value || '').trim();
+            const verifiedFilter = document.getElementById('crimeVerifiedFilter')?.value || 'ALL';
+
+            const params = new URLSearchParams();
+            if (locality) params.append('locality', locality);
+            if (verifiedFilter === 'VERIFIED') params.append('verified_only', 'true');
+
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading crime intelligence records...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/crime-reports?${params.toString()}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error(`Failed to load crime reports (${res.status})`);
+                let reports = await res.json();
+
+                if (verifiedFilter === 'UNVERIFIED') {
+                    reports = reports.filter(r => !r.is_verified);
+                }
+
+                if (reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">No crime records match the active filter.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = reports.map(r => `
+                    <tr>
+                        <td style="font-family: monospace;">#${r.id}</td>
+                        <td style="font-weight: 600;">${escapeHtml(r.category || 'Incident')}</td>
+                        <td>${escapeHtml(r.locality || 'General Sector')}, ${escapeHtml(r.city || 'Bengaluru')}</td>
+                        <td><span style="font-size: 0.72rem; color: var(--text-muted); font-family: monospace;">${escapeHtml(r.trigger_source || 'MANUAL')}</span></td>
+                        <td>${formatDate(r.start_time)}</td>
+                        <td>
+                            <span class="badge ${r.is_verified ? 'badge-verified' : 'badge-unverified'}">
+                                ${r.is_verified ? '✓ VERIFIED' : 'UNVERIFIED'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-small" onclick="toggleCrimeVerification(${r.id}, ${!r.is_verified})" style="font-size: 0.72rem;">
+                                ${r.is_verified ? 'Unverify' : '✓ Endorse Verify'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--status-emergency);">Error: ${escapeHtml(e.message)}</td></tr>`;
+            }
+        }
+
+        async function toggleCrimeVerification(incidentId, newVerified) {
+            const token = localStorage.getItem('adminToken');
+            try {
+                const res = await fetch(`${API_URL}/admin/crime-reports/${incidentId}/verify`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_verified: newVerified })
+                });
+                if (!res.ok) throw new Error("Failed to toggle verification");
+                showToast(`Report #${incidentId} ${newVerified ? 'officially verified' : 'unverified'}`, "success");
+                await fetchCrimeReports();
+                await loadComprehensiveStats();
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        }
+
+        function exportWeeklyCrimeReport() {
+            window.open(`${API_URL}/crime/reports/weekly/export`, '_blank');
+        }
+
+        // --- VIEW 4: Safety Advisories & Patrol Recommendations ---
+        async function fetchSafetyAdvisories() {
+            const token = localStorage.getItem('adminToken');
+            const tbody = document.getElementById('advisoriesTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading safety advisories...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/advisories`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error(`Failed to load advisories (${res.status})`);
+                allAdvisories = await res.json();
+
+                if (allAdvisories.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No official advisories published. Click "+ Broadcast Advisory".</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = allAdvisories.map(adv => `
+                    <tr>
+                        <td>
+                            <strong>${escapeHtml(adv.title)}</strong><br>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">📍 ${escapeHtml(adv.locality)} • ${escapeHtml(adv.issuing_authority)}</span>
+                        </td>
+                        <td>
+                            <span class="badge ${adv.severity === 'CRITICAL' ? 'badge-danger' : adv.severity === 'WARNING' ? 'badge-warning' : 'badge-info'}">
+                                ${adv.severity}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${adv.is_active ? 'badge-active' : 'badge-offduty'}">
+                                ${adv.is_active ? 'ACTIVE' : 'EXPIRED'}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.35rem;">
+                                <button class="btn-small" onclick="toggleAdvisoryStatus(${adv.id})" style="font-size: 0.72rem;">
+                                    ${adv.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                                <button class="btn-small" onclick="deleteAdvisory(${adv.id})" style="font-size: 0.72rem; color: var(--status-emergency);">
+                                    ✕
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--status-emergency);">Error: ${escapeHtml(e.message)}</td></tr>`;
+            }
+        }
+
+        function openBroadcastAdvisoryModal() {
+            const modal = document.getElementById('broadcastAdvisoryModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeBroadcastAdvisoryModal() {
+            const modal = document.getElementById('broadcastAdvisoryModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleBroadcastAdvisorySubmit(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById('broadcastSubmitBtn');
+            const err = document.getElementById('advisoryError');
+            if (btn) { btn.innerText = "Broadcasting..."; btn.disabled = true; }
+            if (err) err.innerText = "";
+
+            const payload = {
+                locality: document.getElementById('advisoryLocality').value.trim(),
+                severity: document.getElementById('advisorySeverity').value,
+                title: document.getElementById('advisoryTitle').value.trim(),
+                advisory: document.getElementById('advisoryMessage').value.trim(),
+                precautions: document.getElementById('advisoryPrecautions').value.trim() || undefined,
+                issuing_authority: document.getElementById('advisoryAuthority').value.trim(),
+                expires_days: parseInt(document.getElementById('advisoryDays').value, 10) || 7
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/admin/advisories`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Failed to broadcast advisory");
+
+                closeBroadcastAdvisoryModal();
+                showToast("Official advisory successfully published!", "success");
+                document.getElementById('broadcastAdvisoryForm').reset();
+                await fetchSafetyAdvisories();
+            } catch (e) {
+                if (err) err.innerText = e.message;
+            } finally {
+                if (btn) { btn.innerText = "Publish Advisory"; btn.disabled = false; }
+            }
+        }
+
+        async function toggleAdvisoryStatus(advisoryId) {
+            const token = localStorage.getItem('adminToken');
+            try {
+                const res = await fetch(`${API_URL}/admin/advisories/${advisoryId}/toggle`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Failed to toggle advisory");
+                showToast("Advisory status updated", "success");
+                await fetchSafetyAdvisories();
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        }
+
+        async function deleteAdvisory(advisoryId) {
+            if (!confirm("Delete this safety advisory permanently?")) return;
+            const token = localStorage.getItem('adminToken');
+            try {
+                const res = await fetch(`${API_URL}/admin/advisories/${advisoryId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Failed to delete advisory");
+                showToast("Advisory deleted", "success");
+                await fetchSafetyAdvisories();
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        }
+
+        async function fetchPatrolRecommendations() {
+            const token = localStorage.getItem('adminToken');
+            const container = document.getElementById('patrolRecommendationsList');
+            if (!container) return;
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading recommendations...</div>';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/patrol-recommendations`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error(`Failed to load recommendations (${res.status})`);
+                allPatrolRecs = await res.json();
+
+                if (allPatrolRecs.length === 0) {
+                    container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem; text-align: center;">No automated patrol deployment recommendations at this time.</div>';
+                    return;
+                }
+
+                container.innerHTML = allPatrolRecs.map(rec => `
+                    <div class="recommendation-card" style="border-left: 4px solid ${rec.risk_level === 'HIGH' ? '#E11D48' : '#D97706'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${escapeHtml(rec.locality)}</span>
+                            <span class="badge ${rec.risk_level === 'HIGH' ? 'badge-danger' : 'badge-warning'}">${rec.risk_level} RISK</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                            ${escapeHtml(rec.reason || 'High incident concentration recorded in recent week.')}
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); flex-wrap: wrap;">
+                            <span>📊 Verified Crimes: <strong>${rec.verified_incidents_count}</strong></span>
+                            <span>📈 Trend: <strong>+${rec.percentage_change}%</strong></span>
+                            <span>⏰ Suggested: <strong>${escapeHtml(rec.suggested_patrol_period || '20:00 - 04:00')}</strong></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 0.65rem;">
+                            <span class="badge ${rec.status === 'APPROVED' || rec.status === 'DEPLOYED' ? 'badge-verified' : 'badge-unverified'}">
+                                ${rec.status}
+                            </span>
+                            ${rec.status === 'PENDING' ? `
+                                <button class="btn-success" onclick="openApprovePatrolModal(${rec.id}, '${escapeHtml(rec.locality)}')" style="font-size: 0.75rem;">
+                                    ✓ Approve &amp; Deploy
+                                </button>
+                            ` : `<span style="font-size: 0.75rem; color: var(--status-success); font-weight: 600;">✓ Deployed</span>`}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = `<div style="color: var(--status-emergency); padding: 1.5rem;">Error: ${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        function openApprovePatrolModal(recId, locality) {
+            pendingApprovePatrolId = recId;
+            const modal = document.getElementById('approvePatrolModal');
+            const locSpan = document.getElementById('approvePatrolLocality');
+            if (locSpan) locSpan.innerText = locality;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeApprovePatrolModal() {
+            pendingApprovePatrolId = null;
+            const modal = document.getElementById('approvePatrolModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function executeApprovePatrol() {
+            if (!pendingApprovePatrolId) return;
+            const token = localStorage.getItem('adminToken');
+            const btn = document.getElementById('confirmApprovePatrolBtn');
+            const err = document.getElementById('approvePatrolError');
+            if (btn) { btn.innerText = "Deploying..."; btn.disabled = true; }
+            if (err) err.innerText = "";
+
+            const officerSelect = document.getElementById('assignOfficerSelect');
+            const officerId = officerSelect ? officerSelect.value : '';
+            const instructions = document.getElementById('patrolInstructions')?.value || '';
+
+            const params = new URLSearchParams();
+            if (officerId) params.append('officer_id', officerId);
+            if (instructions) params.append('instructions', instructions);
+
+            try {
+                const res = await fetch(`${API_URL}/admin/patrol-recommendations/${pendingApprovePatrolId}/approve?${params.toString()}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("Failed to approve patrol recommendation");
+
+                closeApprovePatrolModal();
+                showToast("Patrol unit successfully dispatched to sector!", "success");
+                await fetchPatrolRecommendations();
+                await loadComprehensiveStats();
+            } catch (e) {
+                if (err) err.innerText = e.message;
+            } finally {
+                if (btn) { btn.innerText = "Confirm Deployment"; btn.disabled = false; }
+            }
+        }
+
+        // --- VIEW 5: Citizen Directory Operations ---
         async function fetchUsers() {
             const token = localStorage.getItem('adminToken');
             const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem;">Loading registered users...</td></tr>';
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading registered citizens...</td></tr>';
+
             try {
                 const res = await fetch(`${API_URL}/admin/users`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -1569,15 +2992,15 @@
                 const users = await res.json();
                 
                 tbody.innerHTML = '';
-                if(users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">No users registered in the system.</td></tr>';
+                if (users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">No citizens registered yet.</td></tr>';
                     return;
                 }
                 
                 users.forEach(user => {
                     const tr = document.createElement('tr');
                     const date = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
-                    const name = user.name || 'N/A';
+                    const name = user.name || 'Anonymous Civilian';
                     
                     tr.innerHTML = `
                         <td style="font-family: 'JetBrains Mono', monospace;">#${user.id}</td>
@@ -1590,29 +3013,29 @@
                     tbody.appendChild(tr);
                 });
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--status-emergency)">Error: ${e.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--status-emergency)">Error: ${escapeHtml(e.message)}</td></tr>`;
             }
         }
-        
+
         async function showUserDetails(userId) {
             const modal = document.getElementById('userModal');
             const content = document.getElementById('userDetailsContent');
-            modal.classList.remove('hidden');
-            content.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--text-muted);">Loading user profile...</div>';
+            if (modal) modal.classList.remove('hidden');
+            if (content) content.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--text-muted);">Loading user profile...</div>';
             
             try {
                 const token = localStorage.getItem('adminToken');
                 const res = await fetch(`${API_URL}/admin/users/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(!res.ok) throw new Error("User record not found");
+                if (!res.ok) throw new Error("User record not found");
                 const user = await res.json();
                 
                 let historyHtml = '<div style="color: var(--text-muted); font-size: 0.82rem; padding: 0.5rem 0;">No past incidents recorded for this user.</div>';
-                if(user.incidents && user.incidents.length > 0) {
+                if (user.incidents && user.incidents.length > 0) {
                     historyHtml = `
                         <div style="overflow-x: auto;">
-                            <table class="history-table">
+                            <table class="data-table" style="font-size: 0.8rem;">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -1636,849 +3059,38 @@
                     `;
                 }
 
-                content.innerHTML = `
-                    <div class="detail-grid">
-                        <div class="detail-item"><div class="detail-label">User ID</div><div class="detail-value">#${user.id}</div></div>
-                        <div class="detail-item"><div class="detail-label">Full Name</div><div class="detail-value">${escapeHtml(user.name || 'Not provided')}</div></div>
-                        <div class="detail-item"><div class="detail-label">Email Address</div><div class="detail-value">${escapeHtml(user.email)}</div></div>
-                        <div class="detail-item"><div class="detail-label">Phone Number</div><div class="detail-value">${escapeHtml(user.phone || 'Not provided')}</div></div>
-                        <div class="detail-item"><div class="detail-label">Blood Group</div><div class="detail-value">${escapeHtml(user.blood_group || 'Not provided')}</div></div>
-                        <div class="detail-item"><div class="detail-label">Member Since</div><div class="detail-value">${formatDate(user.created_at)}</div></div>
-                    </div>
-                    <h3 style="margin-top:1.5rem;margin-bottom:0.6rem;font-size:1rem;color:var(--text-primary);border-bottom:1px solid var(--border-subtle);padding-bottom:0.35rem;">
-                        User Incident History (${user.incidents ? user.incidents.length : 0})
-                    </h3>
-                    ${historyHtml}
-                `;
-            } catch(e) {
-                content.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--status-emergency)">Error: ${e.message}</div>`;
-            }
-        }
-
-        // --- Dashboard Initialization ---
-        async function loadDashboard(token) {
-            document.getElementById('authContainer').classList.add('hidden');
-            document.getElementById('dashboardContent').classList.remove('hidden');
-            document.getElementById('loggedInUser').classList.remove('hidden');
-
-            try {
-                // Fetch authenticated admin details
-                const adminRes = await fetch(`${API_URL}/admin/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (adminRes.ok) {
-                    currentAdmin = await adminRes.json();
-                    document.getElementById('userEmailBadge').innerText = currentAdmin.email || currentAdmin.admin_id;
-                }
-            } catch (e) {
-                console.warn("Admin profile fetch notice:", e);
-            }
-
-            initMap();
-            loadDashboardStats(token);
-            fetchIncidents(false, token);
-        }
-
-        async function loadDashboardStats(token = localStorage.getItem('adminToken')) {
-            if (!token) return;
-            try {
-                const res = await fetch(`${API_URL}/admin/dashboard`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!res.ok) return;
-                const stats = await res.json();
-
-                const elUsers = document.getElementById('statUsers');
-                const elActive = document.getElementById('statActive');
-                const elResolved = document.getElementById('statResolved');
-                const elActiveMeta = document.getElementById('statActiveMeta');
-
-                if (elUsers) elUsers.innerText = stats.total_users ?? 0;
-                if (elActive) {
-                    const activeVal = stats.active_incidents ?? 0;
-                    elActive.innerText = activeVal;
-                    if (elActiveMeta) {
-                        elActiveMeta.innerText = activeVal > 0 ? "Immediate attention required" : "No active SOS alerts";
-                    }
-                }
-                if (elResolved) elResolved.innerText = stats.resolved_incidents ?? 0;
-            } catch (err) {
-                console.warn("Stats fetch notice:", err);
-            }
-        }
-
-        async function fetchIncidents(isManual = false, token = localStorage.getItem('adminToken')) {
-            if (!token) return;
-            const list = document.getElementById('incidentList');
-            const refreshBtn = document.getElementById('refreshIncidentsBtn');
-
-            if (isManual && refreshBtn) {
-                refreshBtn.innerText = "↻ Refreshing...";
-                refreshBtn.disabled = true;
-            }
-
-            if (allIncidents.length === 0 && list) {
-                list.innerHTML = `
-                    <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-                        <div style="font-size: 1.6rem; margin-bottom: 0.5rem;">⏳</div>
-                        <div style="font-weight: 500;">Loading incident records...</div>
-                    </div>
-                `;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/admin/incidents`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        logout();
-                        throw new Error("Session expired. Please log in again.");
-                    }
-                    throw new Error(`Failed to fetch incidents (HTTP ${response.status})`);
-                }
-                
-                allIncidents = await response.json();
-                
-                // Update In-Progress stat card from live incidents
-                const inProgressCount = allIncidents.filter(i => {
-                    const s = (i.status || '').toUpperCase();
-                    return s === 'IN_PROGRESS' || s === 'ACKNOWLEDGED';
-                }).length;
-                const elInProgress = document.getElementById('statInProgress');
-                if (elInProgress) elInProgress.innerText = inProgressCount;
-
-                applyFilters();
-                if (isManual) {
-                    showToast("Incidents and map refreshed", "success");
-                }
-            } catch (err) {
-                console.error(err);
-                if (list) {
-                    list.innerHTML = `
-                        <div class="empty-state" style="border-color: var(--status-emergency);">
-                            <div class="empty-icon">⚠️</div>
-                            <div class="empty-title">Failed to Load Incidents</div>
-                            <div class="empty-desc">${escapeHtml(err.message)}</div>
-                            <button class="btn-small" onclick="fetchIncidents(true)" style="margin-top: 1rem;">Retry Connection</button>
-                        </div>
-                    `;
-                }
-            } finally {
-                if (refreshBtn) {
-                    refreshBtn.innerText = "↻ Refresh";
-                    refreshBtn.disabled = false;
-                }
-            }
-        }
-
-        // --- Map Initialization ---
-        function initMap() {
-            if (map) return;
-            const mapContainer = document.getElementById('map');
-            if (!mapContainer) return;
-
-            map = L.map('map', {
-                zoomControl: true,
-                attributionControl: true
-            }).setView([20.5937, 78.9629], 4);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19
-            }).addTo(map);
-        }
-
-        function fitAllMarkers() {
-            if (!map || markers.length === 0) {
-                if (map) map.setView([20.5937, 78.9629], 4);
-                return;
-            }
-            const bounds = markers.map(m => m.getLatLng());
-            if (bounds.length === 1) {
-                map.setView(bounds[0], 14);
-            } else {
-                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
-            }
-        }
-
-        // --- Filter & Search Engine ---
-        function handleSearchInput() {
-            const val = document.getElementById('incidentSearchInput')?.value || '';
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (clearBtn) {
-                if (val.trim().length > 0) {
-                    clearBtn.classList.remove('hidden');
-                } else {
-                    clearBtn.classList.add('hidden');
-                }
-            }
-            applyFilters();
-        }
-
-        function clearSearch() {
-            const input = document.getElementById('incidentSearchInput');
-            if (input) input.value = '';
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (clearBtn) clearBtn.classList.add('hidden');
-            applyFilters();
-        }
-
-        function resetAllFilters() {
-            const input = document.getElementById('incidentSearchInput');
-            if (input) input.value = '';
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (clearBtn) clearBtn.classList.add('hidden');
-            setStatusFilter('ALL');
-        }
-
-        function handleStatusSelectChange() {
-            const select = document.getElementById('statusFilter');
-            if (select) {
-                setStatusFilter(select.value);
-            }
-        }
-
-        function setStatusFilter(status) {
-            const select = document.getElementById('statusFilter');
-            if (select) select.value = status;
-            
-            document.querySelectorAll('.status-pill').forEach(pill => pill.classList.remove('active'));
-            const targetPill = document.getElementById(`pill-${status}`);
-            if (targetPill) targetPill.classList.add('active');
-            
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const statusFilter = document.getElementById('statusFilter')?.value || 'ALL';
-            const rawSearch = (document.getElementById('incidentSearchInput')?.value || '').trim();
-            const query = rawSearch.toLowerCase();
-            const numQuery = query.replace(/^incident\s*#?/i, '').replace(/^#/, '').trim();
-
-            // Update pill counts from entire dataset
-            const totalCount = allIncidents.length;
-            const activeCount = allIncidents.filter(i => (i.status || '').toUpperCase() === 'ACTIVE').length;
-            const inProgCount = allIncidents.filter(i => {
-                const s = (i.status || '').toUpperCase();
-                return s === 'IN_PROGRESS' || s === 'ACKNOWLEDGED';
-            }).length;
-            const resolvedCount = allIncidents.filter(i => (i.status || '').toUpperCase() === 'RESOLVED').length;
-
-            const cAll = document.getElementById('count-ALL'); if (cAll) cAll.innerText = totalCount;
-            const cAct = document.getElementById('count-ACTIVE'); if (cAct) cAct.innerText = activeCount;
-            const cInp = document.getElementById('count-IN_PROGRESS'); if (cInp) cInp.innerText = inProgCount;
-            const cRes = document.getElementById('count-RESOLVED'); if (cRes) cRes.innerText = resolvedCount;
-
-            // 1. Status Filter
-            let filtered = allIncidents;
-            if (statusFilter === 'ACTIVE') {
-                filtered = filtered.filter(i => (i.status || '').toUpperCase() === 'ACTIVE');
-            } else if (statusFilter === 'IN_PROGRESS') {
-                filtered = filtered.filter(i => {
-                    const s = (i.status || '').toUpperCase();
-                    return s === 'IN_PROGRESS' || s === 'ACKNOWLEDGED';
-                });
-            } else if (statusFilter === 'RESOLVED') {
-                filtered = filtered.filter(i => (i.status || '').toUpperCase() === 'RESOLVED');
-            }
-
-            // 2. Search Filter
-            if (query) {
-                filtered = filtered.filter(inc => {
-                    const idStr = String(inc.id);
-                    const idMatch = idStr.includes(query) || (numQuery && idStr.includes(numQuery));
-                    const nameMatch = (inc.user?.name || '').toLowerCase().includes(query);
-                    const emailMatch = (inc.user?.email || '').toLowerCase().includes(query);
-                    const phoneMatch = (inc.user?.phone || '').toLowerCase().includes(query);
-                    const typeMatch = (inc.type || '').toLowerCase().includes(query);
-                    const descMatch = (inc.description || '').toLowerCase().includes(query);
-                    const resolvedMatch = (inc.resolved_by || '').toLowerCase().includes(query);
-                    
-                    let locMatch = false;
-                    if (inc.locations && inc.locations.length > 0) {
-                        const loc = inc.locations[inc.locations.length - 1];
-                        locMatch = String(loc.latitude).includes(query) || String(loc.longitude).includes(query);
-                    }
-
-                    return idMatch || nameMatch || emailMatch || phoneMatch || typeMatch || descMatch || resolvedMatch || locMatch;
-                });
-            }
-
-            const countBadge = document.getElementById('incidentCountBadge');
-            if (countBadge) {
-                if (query || statusFilter !== 'ALL') {
-                    countBadge.innerText = `Showing ${filtered.length} of ${allIncidents.length} incidents`;
-                } else {
-                    countBadge.innerText = `${allIncidents.length} total incidents`;
-                }
-            }
-
-            renderMapMarkers(filtered);
-            renderIncidentList(filtered);
-            updateResolveAllButtonState();
-        }
-
-        function getMarkerColor(status) {
-            const s = (status || '').toUpperCase();
-            if (s === 'ACTIVE') return '#f43f5e';
-            if (s === 'ACKNOWLEDGED' || s === 'IN_PROGRESS') return '#f59e0b';
-            return '#10b981';
-        }
-
-        function renderMapMarkers(incidents) {
-            if (!map) return;
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-            const bounds = [];
-
-            incidents.forEach(inc => {
-                if (!inc.locations || inc.locations.length === 0) return;
-                const latestLoc = inc.locations[inc.locations.length - 1];
-                const lat = latestLoc.latitude;
-                const lng = latestLoc.longitude;
-                bounds.push([lat, lng]);
-
-                const color = getMarkerColor(inc.status);
-                const markerHtml = `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 10px ${color}; cursor: pointer;"></div>`;
-                const icon = L.divIcon({ html: markerHtml, className: 'custom-leaflet-marker', iconSize: [14, 14], iconAnchor: [7, 7] });
-
-                const dateStr = formatDate(inc.start_time);
-                const userName = inc.user?.name || inc.user?.email || `User #${inc.user_id}`;
-                const isResolved = (inc.status || '').toUpperCase() === 'RESOLVED';
-
-                let resolveBtnHtml = '';
-                if (!isResolved) {
-                    resolveBtnHtml = `<button class="btn-resolve" style="width: 100%; margin-top: 0.5rem; justify-content: center; font-size: 0.75rem;" onclick="openResolveConfirmModal(${inc.id});">✓ Resolve Incident</button>`;
-                }
-
-                const popupContent = `
-                    <div style="padding: 4px; min-width: 190px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <strong style="font-size: 0.95rem; color: var(--text-primary);">${escapeHtml(inc.type)}</strong>
-                            <span class="status-badge status-${(inc.status || '').toUpperCase()}" style="font-size: 0.68rem; padding: 0.12rem 0.45rem;">${escapeHtml(inc.status || 'UNKNOWN')}</span>
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 4px;">
-                            <div><strong>Incident #${inc.id}</strong></div>
-                            <div>${escapeHtml(userName)}</div>
-                            <div>${dateStr}</div>
-                        </div>
-                        <div style="display: flex; gap: 0.35rem; margin-top: 0.5rem;">
-                            <button class="btn-view" style="flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.3rem 0.5rem;" onclick="openIncidentDetailModal(${inc.id});">View Details</button>
-                        </div>
-                        ${resolveBtnHtml}
-                    </div>
-                `;
-
-                const marker = L.marker([lat, lng], { icon }).addTo(map);
-                marker.bindPopup(popupContent);
-                marker.incidentId = inc.id;
-                markers.push(marker);
-            });
-
-            if (bounds.length > 1) {
-                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
-            } else if (bounds.length === 1) {
-                map.setView(bounds[0], 14);
-            }
-        }
-
-        function renderIncidentList(incidents) {
-            const list = document.getElementById('incidentList');
-            if (!list) return;
-
-            if (incidents.length === 0) {
-                const hasSearch = Boolean((document.getElementById('incidentSearchInput')?.value || '').trim());
-                const hasFilter = (document.getElementById('statusFilter')?.value || 'ALL') !== 'ALL';
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🛡️</div>
-                        <div class="empty-title">${hasSearch || hasFilter ? 'No Matching Incidents Found' : 'No Emergency Incidents'}</div>
-                        <div class="empty-desc">${hasSearch || hasFilter ? 'No incidents match the active search query or status filter.' : 'All clear. There are currently no emergency incidents in the system.'}</div>
-                        ${hasSearch || hasFilter ? '<button class="btn-small" onclick="resetAllFilters()" style="margin-top: 1rem;">Reset Search & Filters</button>' : ''}
-                    </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = '';
-            incidents.forEach(inc => {
-                const div = document.createElement('div');
-                const statusUpper = (inc.status || '').toUpperCase();
-                div.className = `incident-card border-${statusUpper}`;
-                div.id = `inc-card-${inc.id}`;
-
-                const dateStr = formatDate(inc.start_time);
-                const userName = inc.user?.name || inc.user?.email || `User #${inc.user_id}`;
-                const userPhone = inc.user?.phone ? `<a href="tel:${escapeHtml(inc.user.phone)}" style="color:var(--rose-accent); text-decoration:none;" onclick="event.stopPropagation();">${escapeHtml(inc.user.phone)}</a>` : 'No phone';
-
-                const isResolved = statusUpper === 'RESOLVED';
-                const latestLoc = (inc.locations && inc.locations.length > 0) ? inc.locations[inc.locations.length - 1] : null;
-                const locText = latestLoc 
-                    ? `<span style="font-family:'JetBrains Mono',monospace;">${latestLoc.latitude.toFixed(5)}, ${latestLoc.longitude.toFixed(5)}</span> (&plusmn;${latestLoc.accuracy || 'N/A'}m)` 
-                    : '<span style="color:var(--status-emergency);">No GPS fix</span>';
-
-                let badgeHtml = '';
-                if (statusUpper === 'ACTIVE') {
-                    badgeHtml = `<span class="status-badge status-ACTIVE"><span class="pulse-indicator"></span>ACTIVE</span>`;
-                } else if (statusUpper === 'IN_PROGRESS' || statusUpper === 'ACKNOWLEDGED') {
-                    badgeHtml = `<span class="status-badge status-IN_PROGRESS">IN PROGRESS</span>`;
-                } else if (isResolved) {
-                    badgeHtml = `<span class="status-badge status-RESOLVED">✓ RESOLVED</span>`;
-                } else {
-                    badgeHtml = `<span class="status-badge">${statusUpper}</span>`;
-                }
-
-                let resolutionHtml = '';
-                if (isResolved) {
-                    const resolvedDate = inc.end_time ? formatDate(inc.end_time) : 'Recorded';
-                    const adminBy = inc.resolved_by ? ` by ${escapeHtml(inc.resolved_by)}` : '';
-                    resolutionHtml = `<div style="font-size:0.75rem; color:var(--status-success); margin-top:2px;">✓ Resolved at ${resolvedDate}${adminBy}</div>`;
-                }
-
-                let actionButtons = `
-                    <div class="card-actions-row">
-                        <button class="btn-view" onclick="event.stopPropagation(); openIncidentDetailModal(${inc.id});">
-                            View Record
-                        </button>
-                `;
-
-                if (!isResolved) {
-                    actionButtons += `
-                        <button class="btn-resolve" onclick="event.stopPropagation(); openResolveConfirmModal(${inc.id});">
-                            ✓ Resolve
-                        </button>
-                    `;
-                }
-
-                actionButtons += `</div>`;
-
-                div.innerHTML = `
-                    <div class="card-header-row">
-                        <div>
-                            <div class="incident-type-tag">
-                                <span>${escapeHtml(inc.type)}</span>
+                if (content) {
+                    content.innerHTML = `
+                        <div class="form-row" style="margin-bottom: 1rem;">
+                            <div class="stat-card" style="padding: 0.75rem;">
+                                <div class="stat-title">Citizen ID</div>
+                                <div style="font-weight: 700;">#${user.id}</div>
                             </div>
-                            <div class="incident-id-tag">Incident #${inc.id}</div>
+                            <div class="stat-card" style="padding: 0.75rem;">
+                                <div class="stat-title">Name</div>
+                                <div style="font-weight: 700;">${escapeHtml(user.name || 'Not provided')}</div>
+                            </div>
                         </div>
-                        ${badgeHtml}
-                    </div>
-                    <div class="card-details-grid">
-                        <div><strong>Victim:</strong> ${escapeHtml(userName)} &bull; ${userPhone}</div>
-                        <div><strong>Started:</strong> ${dateStr}</div>
-                        <div><strong>Coordinates:</strong> ${locText}</div>
-                        ${resolutionHtml}
-                    </div>
-                    ${actionButtons}
-                `;
-
-                div.onclick = () => {
-                    document.querySelectorAll('.incident-card').forEach(el => el.classList.remove('active-card'));
-                    div.classList.add('active-card');
-                    openIncidentDetailModal(inc.id);
-                };
-
-                list.appendChild(div);
-            });
-        }
-
-        // --- Incident Detail Modal Logic ---
-        async function openIncidentDetailModal(incidentId) {
-            const modal = document.getElementById('incidentModal');
-            const title = document.getElementById('incidentModalTitle');
-            const subtitle = document.getElementById('incidentModalSubtitle');
-            const content = document.getElementById('incidentDetailContent');
-
-            activeModalIncidentId = incidentId;
-            modal.classList.remove('hidden');
-
-            title.innerHTML = `Incident #${incidentId}`;
-            subtitle.innerText = "Loading complete operational details...";
-            content.innerHTML = `
-                <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-                    <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">⏳</div>
-                    <div>Fetching complete incident record...</div>
-                </div>
-            `;
-
-            try {
-                const token = localStorage.getItem('adminToken');
-                let inc = null;
-                
-                const res = await fetch(`${API_URL}/admin/incidents/${incidentId}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (res.ok) {
-                    inc = await res.json();
-                } else {
-                    inc = allIncidents.find(i => i.id === incidentId);
-                    if (!inc) throw new Error("Incident not found");
+                        <div class="form-row" style="margin-bottom: 1rem;">
+                            <div class="stat-card" style="padding: 0.75rem;">
+                                <div class="stat-title">Email</div>
+                                <div>${escapeHtml(user.email)}</div>
+                            </div>
+                            <div class="stat-card" style="padding: 0.75rem;">
+                                <div class="stat-title">Phone</div>
+                                <div>${escapeHtml(user.phone || 'Not provided')}</div>
+                            </div>
+                        </div>
+                        <h4 style="font-size: 0.9rem; margin-top: 1rem; margin-bottom: 0.5rem;">Incident History (${user.incidents ? user.incidents.length : 0})</h4>
+                        ${historyHtml}
+                    `;
                 }
-
-                renderIncidentDetailContent(inc);
-
-            } catch (err) {
-                content.innerHTML = `
-                    <div class="empty-state" style="border-color: var(--status-emergency);">
-                        <div class="empty-icon">⚠️</div>
-                        <div class="empty-title">Error Loading Incident</div>
-                        <div class="empty-desc">${escapeHtml(err.message)}</div>
-                        <button class="btn-small" onclick="closeIncidentModal()" style="margin-top: 1rem;">Close</button>
-                    </div>
-                `;
+            } catch(e) {
+                if (content) content.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--status-emergency)">Error: ${escapeHtml(e.message)}</div>`;
             }
         }
 
-        function renderIncidentDetailContent(inc) {
-            const title = document.getElementById('incidentModalTitle');
-            const subtitle = document.getElementById('incidentModalSubtitle');
-            const content = document.getElementById('incidentDetailContent');
-
-            const isResolved = (inc.status || '').toUpperCase() === 'RESOLVED';
-            const statusClass = (inc.status || '').toUpperCase();
-            const latestLoc = (inc.locations && inc.locations.length > 0) ? inc.locations[inc.locations.length - 1] : null;
-
-            title.innerHTML = `
-                Incident #${inc.id} • ${escapeHtml(inc.type)}
-                <span class="status-badge status-${statusClass}" style="margin-left: 0.5rem;">
-                    ${statusClass === 'ACTIVE' ? '<span class="pulse-indicator"></span>' : ''}${statusClass}
-                </span>
-            `;
-            subtitle.innerText = `Recorded at ${formatDate(inc.start_time)}`;
-
-            const startTimeStr = formatDate(inc.start_time);
-            const endTimeStr = inc.end_time ? formatDate(inc.end_time) : '<span style="color:var(--status-emergency);">Active / Unresolved</span>';
-            const lastUpdatedStr = latestLoc ? formatDate(latestLoc.timestamp) : startTimeStr;
-            const resolvedByStr = inc.resolved_by ? escapeHtml(inc.resolved_by) : (isResolved ? 'Administrator' : 'Not resolved');
-
-            const user = inc.user || {};
-            const userName = user.name || 'Not provided';
-            const userEmail = user.email || 'Not provided';
-            const userPhone = user.phone ? `<a href="tel:${escapeHtml(user.phone)}" style="color:var(--rose-accent); text-decoration:none;">${escapeHtml(user.phone)}</a>` : 'Not provided';
-            const userBlood = user.blood_group || 'Not provided';
-
-            let locSnippet = '<div style="color: var(--status-emergency);">No GPS tracking fixes recorded for this incident.</div>';
-            let mapLinks = '';
-            if (latestLoc) {
-                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${latestLoc.latitude},${latestLoc.longitude}`;
-                locSnippet = `
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--text-primary);">
-                        ${latestLoc.latitude.toFixed(6)}, ${latestLoc.longitude.toFixed(6)}
-                    </div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">
-                        Accuracy: &plusmn;${latestLoc.accuracy || 'N/A'}m &bull; Fix Time: ${formatDate(latestLoc.timestamp)}
-                    </div>
-                `;
-                mapLinks = `
-                    <div style="margin-top: 0.65rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="btn-small" onclick="window.open('${mapsUrl}', '_blank');">🗺️ Open in Google Maps</button>
-                        <button class="btn-small" onclick="focusIncidentOnMap(${inc.id}); closeIncidentModal();">📍 Center on Live Map</button>
-                    </div>
-                `;
-            }
-
-            let contactsHtml = '<div style="color: var(--text-muted); font-size: 0.82rem; padding: 0.5rem 0;">No emergency contacts registered by user.</div>';
-            if (user.contacts && user.contacts.length > 0) {
-                contactsHtml = `
-                    <div style="overflow-x: auto;">
-                        <table class="contacts-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Relationship</th>
-                                    <th>Phone</th>
-                                    <th>Priority</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${user.contacts.map(c => `
-                                    <tr>
-                                        <td><strong>${escapeHtml(c.name)}</strong></td>
-                                        <td>${escapeHtml(c.relation || 'Not specified')}</td>
-                                        <td><a href="tel:${escapeHtml(c.phone)}" style="color: var(--rose-accent); text-decoration: none;">${escapeHtml(c.phone)}</a></td>
-                                        <td>${c.is_primary ? '<span class="status-badge status-RESOLVED" style="font-size: 0.7rem; padding: 0.12rem 0.45rem;">PRIMARY</span>' : '<span style="color:var(--text-muted); font-size:0.75rem;">Secondary</span>'}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-
-            let breadcrumbsHtml = '<div style="color: var(--text-muted); font-size: 0.82rem; padding: 0.5rem 0;">No GPS tracking trail points available.</div>';
-            if (inc.locations && inc.locations.length > 0) {
-                breadcrumbsHtml = `
-                    <div style="overflow-x: auto; max-height: 180px; overflow-y: auto;">
-                        <table class="history-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Timestamp</th>
-                                    <th>Coordinates</th>
-                                    <th>Accuracy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${inc.locations.map((loc, idx) => `
-                                    <tr>
-                                        <td>${idx + 1}</td>
-                                        <td>${formatDate(loc.timestamp)}</td>
-                                        <td style="font-family: 'JetBrains Mono', monospace;">${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}</td>
-                                        <td>&plusmn;${loc.accuracy || 'N/A'}m</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-
-            let footerActions = '';
-            if (!isResolved) {
-                footerActions = `
-                    <button class="btn-resolve" onclick="openResolveConfirmModal(${inc.id});" style="padding: 0.55rem 1.25rem;">
-                        ✓ Resolve Incident
-                    </button>
-                `;
-            } else {
-                footerActions = `
-                    <div style="color: var(--status-success); font-weight: 600; display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem;">
-                        ✓ Incident Successfully Resolved
-                    </div>
-                `;
-            }
-
-            content.innerHTML = `
-                <h3 style="margin-bottom: 0.65rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; font-size: 0.95rem; color: var(--text-primary);">Incident Operational Metrics</h3>
-                <div class="detail-grid">
-                    <div class="detail-item"><div class="detail-label">Incident ID</div><div class="detail-value">#${inc.id}</div></div>
-                    <div class="detail-item"><div class="detail-label">Emergency Type</div><div class="detail-value">${escapeHtml(inc.type)}</div></div>
-                    <div class="detail-item"><div class="detail-label">Current Status</div><div class="detail-value"><span class="status-badge status-${statusClass}">${statusClass}</span></div></div>
-                    <div class="detail-item"><div class="detail-label">Report Description</div><div class="detail-value" style="font-size:0.85rem;">${escapeHtml(inc.description || 'Not provided')}</div></div>
-                    <div class="detail-item"><div class="detail-label">Created At</div><div class="detail-value" style="font-size:0.85rem;">${startTimeStr}</div></div>
-                    <div class="detail-item"><div class="detail-label">Last Location Fix</div><div class="detail-value" style="font-size:0.85rem;">${lastUpdatedStr}</div></div>
-                    <div class="detail-item"><div class="detail-label">Resolution Timestamp</div><div class="detail-value" style="font-size:0.85rem;">${endTimeStr}</div></div>
-                    <div class="detail-item"><div class="detail-label">Resolved By Admin</div><div class="detail-value" style="font-size:0.85rem;">${resolvedByStr}</div></div>
-                </div>
-
-                <h3 style="margin-bottom: 0.65rem; margin-top: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; font-size: 0.95rem; color: var(--text-primary);">Victim / Registered Profile</h3>
-                <div class="detail-grid">
-                    <div class="detail-item"><div class="detail-label">Name</div><div class="detail-value">${escapeHtml(userName)}</div></div>
-                    <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value" style="font-size:0.85rem;">${escapeHtml(userEmail)}</div></div>
-                    <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">${userPhone}</div></div>
-                    <div class="detail-item"><div class="detail-label">Blood Group</div><div class="detail-value">${escapeHtml(userBlood)}</div></div>
-                </div>
-
-                <h3 style="margin-bottom: 0.65rem; margin-top: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; font-size: 0.95rem; color: var(--text-primary);">Location & GPS Coordinates</h3>
-                <div style="background: var(--bg-surface-elevated); padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 1.25rem;">
-                    ${locSnippet}
-                    ${mapLinks}
-                </div>
-
-                <h3 style="margin-bottom: 0.65rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; font-size: 0.95rem; color: var(--text-primary);">Emergency Contacts</h3>
-                ${contactsHtml}
-
-                <h3 style="margin-bottom: 0.65rem; margin-top: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.35rem; font-size: 0.95rem; color: var(--text-primary);">GPS Breadcrumb History (${inc.locations ? inc.locations.length : 0} fixes)</h3>
-                ${breadcrumbsHtml}
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.75rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); flex-wrap: wrap; gap: 0.85rem;">
-                    <div>${footerActions}</div>
-                    <button class="btn-small" onclick="closeIncidentModal()" style="padding: 0.55rem 1.25rem;">Close</button>
-                </div>
-            `;
-        }
-
-        function closeIncidentModal() {
-            document.getElementById('incidentModal').classList.add('hidden');
-            activeModalIncidentId = null;
-        }
-
-        // --- Single Resolve Modal Logic ---
-        function openResolveConfirmModal(incidentId) {
-            pendingResolveIncidentId = incidentId;
-            const modal = document.getElementById('resolveConfirmModal');
-            const confirmText = document.getElementById('resolveConfirmText');
-            const adminEmail = document.getElementById('resolveAdminEmail');
-            const errorMsg = document.getElementById('resolveModalError');
-            const confirmBtn = document.getElementById('confirmResolveBtn');
-
-            confirmText.innerText = `Are you sure you want to mark Incident #${incidentId} as RESOLVED?`;
-            adminEmail.innerText = currentAdmin?.email || (currentAdmin?.admin_id ? `${currentAdmin.admin_id} (Admin)` : 'Authenticated Admin');
-            errorMsg.innerText = '';
-            confirmBtn.disabled = false;
-            confirmBtn.innerText = 'Confirm Resolution';
-
-            modal.classList.remove('hidden');
-        }
-
-        function closeResolveModal() {
-            document.getElementById('resolveConfirmModal').classList.add('hidden');
-            pendingResolveIncidentId = null;
-        }
-
-        async function executeResolveIncident() {
-            if (!pendingResolveIncidentId) return;
-            const token = localStorage.getItem('adminToken');
-            const btn = document.getElementById('confirmResolveBtn');
-            const errEl = document.getElementById('resolveModalError');
-
-            btn.disabled = true;
-            btn.innerText = "Resolving...";
-            errEl.innerText = "";
-
-            try {
-                const res = await fetch(`${API_URL}/admin/incidents/${pendingResolveIncidentId}/resolve`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.detail || "Failed to resolve incident");
-                }
-
-                const resolvedId = pendingResolveIncidentId;
-                closeResolveModal();
-                showToast(`Incident #${resolvedId} successfully resolved!`, 'success');
-
-                const idx = allIncidents.findIndex(i => i.id === resolvedId);
-                if (idx !== -1) {
-                    allIncidents[idx] = data;
-                }
-
-                loadDashboardStats(token);
-                applyFilters();
-
-                if (activeModalIncidentId === resolvedId) {
-                    renderIncidentDetailContent(data);
-                }
-
-            } catch (err) {
-                errEl.innerText = err.message;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Confirm Resolution";
-            }
-        }
-
-        // --- Resolve All Logic ---
-        function updateResolveAllButtonState() {
-            const btn = document.getElementById('resolveAllBtn');
-            if (!btn) return;
-            const unresolvedCount = allIncidents.filter(i => (i.status || '').toUpperCase() !== 'RESOLVED').length;
-            if (unresolvedCount === 0) {
-                btn.disabled = true;
-                btn.title = "No unresolved incidents in system";
-                btn.innerHTML = "✓ All Resolved (0)";
-            } else {
-                btn.disabled = false;
-                btn.title = `Resolve all ${unresolvedCount} active / unresolved incident(s)`;
-                btn.innerHTML = `✓✓ Resolve All (${unresolvedCount})`;
-            }
-        }
-
-        function openResolveAllModal() {
-            const unresolvedCount = allIncidents.filter(i => (i.status || '').toUpperCase() !== 'RESOLVED').length;
-            if (unresolvedCount === 0) {
-                showToast("No unresolved incidents to resolve", "info");
-                return;
-            }
-            const modal = document.getElementById('resolveAllModal');
-            const countEl = document.getElementById('bulkResolveCountText');
-            const adminEmail = document.getElementById('bulkResolveAdminEmail');
-            const errEl = document.getElementById('resolveAllModalError');
-            const confirmBtn = document.getElementById('confirmResolveAllBtn');
-            const cancelBtn = document.getElementById('cancelResolveAllBtn');
-
-            countEl.innerText = `${unresolvedCount}`;
-            adminEmail.innerText = currentAdmin?.email || (currentAdmin?.admin_id ? `${currentAdmin.admin_id} (Admin)` : 'Authenticated Admin');
-            errEl.innerText = '';
-            confirmBtn.disabled = false;
-            confirmBtn.innerText = `Confirm Bulk Resolution (${unresolvedCount})`;
-            cancelBtn.disabled = false;
-
-            modal.classList.remove('hidden');
-        }
-
-        function closeResolveAllModal() {
-            document.getElementById('resolveAllModal').classList.add('hidden');
-        }
-
-        async function executeResolveAllIncidents() {
-            const token = localStorage.getItem('adminToken');
-            const confirmBtn = document.getElementById('confirmResolveAllBtn');
-            const cancelBtn = document.getElementById('cancelResolveAllBtn');
-            const errEl = document.getElementById('resolveAllModalError');
-
-            confirmBtn.disabled = true;
-            confirmBtn.innerText = "Resolving All Incidents...";
-            cancelBtn.disabled = true;
-            errEl.innerText = "";
-
-            try {
-                const res = await fetch(`${API_URL}/admin/incidents/resolve-all`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.detail || `Failed to resolve incidents (HTTP ${res.status})`);
-                }
-
-                closeResolveAllModal();
-                showToast(`Bulk resolution complete: ${data.resolved_count} incident(s) resolved!`, 'success');
-
-                await fetchIncidents(false, token);
-                await loadDashboardStats(token);
-
-                if (activeModalIncidentId) {
-                    const updated = allIncidents.find(i => i.id === activeModalIncidentId);
-                    if (updated) {
-                        renderIncidentDetailContent(updated);
-                    }
-                }
-            } catch (err) {
-                errEl.innerText = err.message;
-            } finally {
-                confirmBtn.disabled = false;
-                confirmBtn.innerText = "Confirm Bulk Resolution";
-                cancelBtn.disabled = false;
-            }
-        }
-
-        function focusIncidentOnMap(incidentId) {
-            const inc = allIncidents.find(i => i.id === incidentId);
-            if (!inc || !inc.locations || inc.locations.length === 0) {
-                showToast("No location coordinates recorded for this incident", "error");
-                return;
-            }
-            const loc = inc.locations[inc.locations.length - 1];
-            if (map) {
-                map.setView([loc.latitude, loc.longitude], 16);
-                markers.forEach(m => {
-                    const ll = m.getLatLng();
-                    if (Math.abs(ll.lat - loc.latitude) < 0.0001 && Math.abs(ll.lng - loc.longitude) < 0.0001) {
-                        m.openPopup();
-                    }
-                });
-            }
-            document.querySelectorAll('.incident-card').forEach(el => el.classList.remove('active-card'));
-            const listEl = document.getElementById(`inc-card-${incidentId}`);
-            if (listEl) {
-                listEl.classList.add('active-card');
-                listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }
-
-        // --- Helper Functions ---
+        // --- Helper Utilities ---
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toastNotification');
             if (!toast) return;
@@ -2521,29 +3133,14 @@
         // --- Keyboard and Backdrop Dismissal ---
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (!document.getElementById('resolveAllModal').classList.contains('hidden')) {
-                    closeResolveAllModal();
-                } else if (!document.getElementById('resolveConfirmModal').classList.contains('hidden')) {
-                    closeResolveModal();
-                } else if (!document.getElementById('incidentModal').classList.contains('hidden')) {
-                    closeIncidentModal();
-                } else if (!document.getElementById('userModal').classList.contains('hidden')) {
-                    document.getElementById('userModal').classList.add('hidden');
-                }
+                document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
             }
         });
 
-        document.getElementById('incidentModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'incidentModal') closeIncidentModal();
-        });
-        document.getElementById('resolveConfirmModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'resolveConfirmModal') closeResolveModal();
-        });
-        document.getElementById('resolveAllModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'resolveAllModal') closeResolveAllModal();
-        });
-        document.getElementById('userModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'userModal') document.getElementById('userModal').classList.add('hidden');
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.add('hidden');
+            });
         });
     </script>
 </body>

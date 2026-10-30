@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PoliceAuthProvider, usePoliceAuth } from './context/PoliceAuthContext';
-import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import { AccountModal } from './components/AccountModal';
 
 // Primary Application Views
@@ -25,9 +24,6 @@ import { PoliceDashboard } from './components/police/PoliceDashboard';
 import { CrimeMapView } from './components/crime/CrimeMapView';
 import { CommunitySafetyView } from './components/crime/CommunitySafetyView';
 
-// Administrator Command Center
-import { AdminDashboard } from './components/admin/AdminDashboard';
-
 import type { PageView } from './types';
 
 const isTrackRoute = () => {
@@ -42,7 +38,6 @@ const isTrackRoute = () => {
 export const AppContent: React.FC = () => {
   const { user, isGuest, loading } = useAuth();
   const { officer } = usePoliceAuth();
-  const { adminUser, isAdminAuthenticated } = useAdminAuth();
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<PageView | 'not-found'>(() => {
     return isTrackRoute() ? 'track' : 'welcome';
@@ -80,14 +75,10 @@ export const AppContent: React.FC = () => {
         'crime-map',
         'crime-reports',
         'community-safety',
-        'admin-dashboard',
       ];
 
       if (!baseHash || baseHash === 'welcome') {
-        if (isAdminAuthenticated && adminUser) {
-          setCurrentView('admin-dashboard');
-          window.location.hash = 'admin-dashboard';
-        } else if (officer) {
+        if (officer) {
           setCurrentView('police-dashboard');
           window.location.hash = 'police-dashboard';
         } else if (user) {
@@ -110,7 +101,7 @@ export const AppContent: React.FC = () => {
       window.removeEventListener('hashchange', syncRouteFromHash);
       window.removeEventListener('popstate', syncRouteFromHash);
     };
-  }, [user, officer, adminUser, isAdminAuthenticated, isGuest, loading]);
+  }, [user, officer, isGuest, loading]);
 
   const navigateTo = (view: PageView) => {
     setCurrentView(view);
@@ -121,27 +112,6 @@ export const AppContent: React.FC = () => {
   // Standalone recipient tracking view (PUBLIC - ZERO AUTH DEPENDENCY)
   if (currentView === 'track' || isTrackRoute()) {
     return <LiveTrackingView onNavigate={navigateTo} />;
-  }
-
-  // ADMINISTRATOR COMMAND CONSOLE (DEDICATED SYSTEM CONTROL ROUTE)
-  if (currentView === 'admin-dashboard') {
-    if (isAdminAuthenticated && adminUser) {
-      return (
-        <AdminDashboard 
-          onLogout={() => navigateTo('welcome')} 
-          onNavigatePublic={navigateTo} 
-        />
-      );
-    }
-    // If not authenticated as admin, show Admin Login interface
-    return (
-      <WelcomeAuthView 
-        initialPortal="admin"
-        onEnterDashboard={() => navigateTo('dashboard')}
-        onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
-        onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
-      />
-    );
   }
 
   // POLICE DASHBOARD ROUTE (DEDICATED LAW ENFORCEMENT INTERFACE)
@@ -160,7 +130,6 @@ export const AppContent: React.FC = () => {
         initialPortal="police"
         onEnterDashboard={() => navigateTo('dashboard')}
         onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
-        onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
       />
     );
   }
@@ -183,13 +152,12 @@ export const AppContent: React.FC = () => {
   }
 
   // First-visit authentication / public welcome landing flow
-  if (currentView === 'welcome' && !user && !officer && !isAdminAuthenticated) {
+  if (currentView === 'welcome' && !user && !officer) {
     return (
       <>
         <WelcomeAuthView 
           onEnterDashboard={() => navigateTo('dashboard')} 
           onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
-          onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
         />
         <AccountModal 
           isOpen={accountModalOpen} 
@@ -282,9 +250,7 @@ export const App: React.FC = () => {
     <ThemeProvider>
       <AuthProvider>
         <PoliceAuthProvider>
-          <AdminAuthProvider>
-            <AppContent />
-          </AdminAuthProvider>
+          <AppContent />
         </PoliceAuthProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -14,13 +14,11 @@ import {
   LogIn,
   Smartphone,
   Users,
-  Radio,
-  Lock
+  Radio
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { usePoliceAuth } from '../context/PoliceAuthContext';
-import { useAdminAuth } from '../context/AdminAuthContext';
 import { APP_CONFIG } from '../config/appConfig';
 import type { PageView } from '../types';
 
@@ -38,7 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { toggleTheme, isDark } = useTheme();
   const { user, isGuest, signOut } = useAuth();
   const { officer, logoutPolice } = usePoliceAuth();
-  const { adminUser, isAdminAuthenticated, logoutAdmin } = useAdminAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -68,13 +65,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
     logoutPolice();
-    onNavigate('welcome');
-  };
-
-  const handleAdminLogout = () => {
-    setUserDropdownOpen(false);
-    setMobileMenuOpen(false);
-    logoutAdmin();
     onNavigate('welcome');
   };
 
@@ -139,30 +129,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Action Bar: Police Portal, Theme, APK Download, Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
-            
-            {/* ADMINISTRATOR CONSOLE SHORTCUT (IF LOGGED IN) */}
-            {adminUser && isAdminAuthenticated && (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => handleLinkClick('admin-dashboard')}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-950 border border-indigo-500/40 text-indigo-300 text-xs font-bold hover:bg-indigo-900 transition-colors shadow-xs cursor-pointer"
-                  title={`Admin Command Console - ${adminUser.admin_id}`}
-                >
-                  <Lock size={13} className="text-indigo-400" />
-                  <span>Admin ({adminUser.admin_id})</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAdminLogout}
-                  className="p-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
-                  title="Sign out of admin portal"
-                  aria-label="Admin sign out"
-                >
-                  <LogOut size={13} />
-                </button>
-              </div>
-            )}
-
             {/* POLICE OFFICER CONSOLE SHORTCUT (IF LOGGED IN) */}
             {officer ? (
               <div className="flex items-center gap-1.5">
@@ -184,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <LogOut size={13} />
                 </button>
               </div>
-            ) : !isAdminAuthenticated && (
+            ) : (
               <button
                 onClick={() => {
                   window.location.hash = 'welcome';
@@ -194,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Law enforcement access"
               >
                 <ShieldAlert size={12} className="text-amber-500" />
-                <span>Police / Admin</span>
+                <span>Police Portal</span>
               </button>
             )}
 
@@ -332,16 +298,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{link.label}</span>
               </button>
             ))}
-
-            {adminUser && isAdminAuthenticated && (
-              <button
-                onClick={() => handleLinkClick('admin-dashboard')}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-indigo-300 bg-indigo-950 border border-indigo-500/40 transition-colors cursor-pointer"
-              >
-                <Lock size={14} />
-                <span>Admin Command Center ({adminUser.admin_id})</span>
-              </button>
-            )}
 
             {officer && (
               <button
