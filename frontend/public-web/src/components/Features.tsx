@@ -285,9 +285,11 @@ export const Features: React.FC<FeaturesProps> = ({ onExploreDashboard }) => {
                 )}
                 <a
                   href={APP_CONFIG.downloadUrl}
+                  download={APP_CONFIG.apkFilename}
                   className="py-1.5 px-3 rounded-lg bg-[var(--color-primary)] text-white font-bold text-[11px] hover:opacity-90 shrink-0"
+                  title={`Download ${APP_CONFIG.apkFilename} (${APP_CONFIG.apkSize})`}
                 >
-                  Download SafeHer.apk
+                  Download {APP_CONFIG.apkFilename}
                 </a>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
-import { Home, Map as MapIcon, User, ShieldAlert } from 'lucide-react-native';
+import { Home, Map as MapIcon, User, ShieldAlert, Shield, AlertTriangle, MapPin, Clock, TrendingUp } from 'lucide-react-native';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { EmergencyProvider, useEmergency } from './src/context/EmergencyContext';
@@ -29,9 +29,20 @@ import { ReportScreen } from './src/screens/ReportScreen';
 import { PrivacySecurityScreen } from './src/screens/PrivacySecurityScreen';
 import { NotificationsScreen } from './src/screens/NotificationsScreen';
 import { IncidentsScreen } from './src/screens/IncidentsScreen';
+import { CrimeSearchScreen } from './src/screens/CrimeSearchScreen';
+import { CommunitySafetyScreen } from './src/screens/CommunitySafetyScreen';
+
+import { PoliceDashboardScreen } from './src/screens/police/PoliceDashboardScreen';
+import { PoliceAlertsScreen } from './src/screens/police/PoliceAlertsScreen';
+import { PoliceIncidentResponseScreen } from './src/screens/police/PoliceIncidentResponseScreen';
+import { PolicePatrolMapScreen } from './src/screens/police/PolicePatrolMapScreen';
+import { PoliceHistoryScreen } from './src/screens/police/PoliceHistoryScreen';
+import { PoliceRecommendationsScreen } from './src/screens/police/PoliceRecommendationsScreen';
+import { PoliceWeeklyReportScreen } from './src/screens/police/PoliceWeeklyReportScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const PoliceTab = createBottomTabNavigator();
 
 function MainTabs() {
   const { colors, isDark } = useAppTheme();
@@ -93,6 +104,81 @@ function MainTabs() {
   );
 }
 
+function PoliceTabs() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width > 768;
+
+  return (
+    <PoliceTab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#0A0F1D',
+          borderTopColor: '#1E293B',
+          borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+          paddingTop: 12,
+          elevation: 0,
+          ...(isDesktop && {
+            width: '100%',
+            maxWidth: 1100,
+            alignSelf: 'center',
+          })
+        },
+        tabBarActiveTintColor: '#38BDF8',
+        tabBarInactiveTintColor: '#64748B',
+        tabBarLabelStyle: {
+          ...typography.footnote,
+          marginTop: 4,
+          fontWeight: '600',
+        }
+      }}
+    >
+      <PoliceTab.Screen
+        name="PoliceDashboard"
+        component={PoliceDashboardScreen}
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <Shield color={color} size={22} />
+        }}
+      />
+      <PoliceTab.Screen
+        name="PoliceAlerts"
+        component={PoliceAlertsScreen}
+        options={{
+          title: 'SOS Alerts',
+          tabBarIcon: ({ color }) => <AlertTriangle color={color} size={22} />
+        }}
+      />
+      <PoliceTab.Screen
+        name="PolicePatrolMap"
+        component={PolicePatrolMapScreen}
+        options={{
+          title: 'Patrol Map',
+          tabBarIcon: ({ color }) => <MapPin color={color} size={22} />
+        }}
+      />
+      <PoliceTab.Screen
+        name="PoliceHistory"
+        component={PoliceHistoryScreen}
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color }) => <Clock color={color} size={22} />
+        }}
+      />
+      <PoliceTab.Screen
+        name="PoliceRecommendations"
+        component={PoliceRecommendationsScreen}
+        options={{
+          title: 'Hotspots',
+          tabBarIcon: ({ color }) => <TrendingUp color={color} size={22} />
+        }}
+      />
+    </PoliceTab.Navigator>
+  );
+}
+
 function SplashScreen() {
   const { colors } = useAppTheme();
   return (
@@ -103,7 +189,7 @@ function SplashScreen() {
 }
 
 function AppNavigator() {
-  const { user, loading } = useAuth();
+  const { user, isPolice, loading } = useAuth();
   const { isEmergencyActive, isEmergencyLoading } = useEmergency();
   const { colors } = useAppTheme();
 
@@ -111,6 +197,13 @@ function AppNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bgPrimary }, animation: 'fade' }}>
       {(loading || (user && isEmergencyLoading)) ? (
         <Stack.Screen name="Splash" component={SplashScreen} />
+      ) : isPolice ? (
+        // POLICE OFFICER PORTAL
+        <>
+          <Stack.Screen name="PoliceTabs" component={PoliceTabs} />
+          <Stack.Screen name="PoliceIncidentResponse" component={PoliceIncidentResponseScreen} />
+          <Stack.Screen name="PoliceWeeklyReport" component={PoliceWeeklyReportScreen} />
+        </>
       ) : !user ? (
         <Stack.Group>
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -133,6 +226,8 @@ function AppNavigator() {
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
           <Stack.Screen name="Incidents" component={IncidentsScreen} />
           <Stack.Screen name="IncidentDetails" component={IncidentDetailsScreen} />
+          <Stack.Screen name="CrimeSearch" component={CrimeSearchScreen} />
+          <Stack.Screen name="CommunitySafety" component={CommunitySafetyScreen} />
         </>
       )}
     </Stack.Navigator>

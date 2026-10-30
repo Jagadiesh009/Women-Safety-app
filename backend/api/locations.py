@@ -54,6 +54,16 @@ def add_location_update(
     db.add(new_location)
     db.commit()
     db.refresh(new_location)
+
+    # Check and trigger/update police dispatch if pending or unassigned
+    try:
+        from api.incidents import dispatch_incident_to_officers
+        if db_incident.dispatch_status in ("UNASSIGNED", "DISPATCH_PENDING"):
+            dispatch_incident_to_officers(db_incident, db, user_lat=location.latitude, user_lng=location.longitude)
+            db.commit()
+    except Exception as e:
+        print(f"Non-critical dispatch update note: {e}")
+
     return new_location
 
 # ============================================================================

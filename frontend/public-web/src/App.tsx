@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PoliceAuthProvider, usePoliceAuth } from './context/PoliceAuthContext';
+import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import { AccountModal } from './components/AccountModal';
 
 // Primary Application Views
@@ -18,6 +20,14 @@ import { LegalViews } from './components/LegalViews';
 import { NotFoundView } from './components/NotFoundView';
 import { LiveTrackingView } from './components/LiveTrackingView';
 
+// Police & Crime Intelligence Views
+import { PoliceDashboard } from './components/police/PoliceDashboard';
+import { CrimeMapView } from './components/crime/CrimeMapView';
+import { CommunitySafetyView } from './components/crime/CommunitySafetyView';
+
+// Administrator Command Center
+import { AdminDashboard } from './components/admin/AdminDashboard';
+
 import type { PageView } from './types';
 
 const isTrackRoute = () => {
@@ -31,6 +41,8 @@ const isTrackRoute = () => {
 
 export const AppContent: React.FC = () => {
   const { user, isGuest, loading } = useAuth();
+  const { officer } = usePoliceAuth();
+  const { adminUser, isAdminAuthenticated } = useAdminAuth();
   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<PageView | 'not-found'>(() => {
     return isTrackRoute() ? 'track' : 'welcome';
@@ -64,10 +76,21 @@ export const AppContent: React.FC = () => {
         'privacy',
         'terms',
         'track',
+        'police-dashboard',
+        'crime-map',
+        'crime-reports',
+        'community-safety',
+        'admin-dashboard',
       ];
 
       if (!baseHash || baseHash === 'welcome') {
-        if (user) {
+        if (isAdminAuthenticated && adminUser) {
+          setCurrentView('admin-dashboard');
+          window.location.hash = 'admin-dashboard';
+        } else if (officer) {
+          setCurrentView('police-dashboard');
+          window.location.hash = 'police-dashboard';
+        } else if (user) {
           setCurrentView('dashboard');
           window.location.hash = 'dashboard';
         } else {
@@ -87,7 +110,7 @@ export const AppContent: React.FC = () => {
       window.removeEventListener('hashchange', syncRouteFromHash);
       window.removeEventListener('popstate', syncRouteFromHash);
     };
-  }, [user, isGuest, loading]);
+  }, [user, officer, adminUser, isAdminAuthenticated, isGuest, loading]);
 
   const navigateTo = (view: PageView) => {
     setCurrentView(view);
@@ -98,6 +121,48 @@ export const AppContent: React.FC = () => {
   // Standalone recipient tracking view (PUBLIC - ZERO AUTH DEPENDENCY)
   if (currentView === 'track' || isTrackRoute()) {
     return <LiveTrackingView onNavigate={navigateTo} />;
+  }
+
+  // ADMINISTRATOR COMMAND CONSOLE (DEDICATED SYSTEM CONTROL ROUTE)
+  if (currentView === 'admin-dashboard') {
+    if (isAdminAuthenticated && adminUser) {
+      return (
+        <AdminDashboard 
+          onLogout={() => navigateTo('welcome')} 
+          onNavigatePublic={navigateTo} 
+        />
+      );
+    }
+    // If not authenticated as admin, show Admin Login interface
+    return (
+      <WelcomeAuthView 
+        initialPortal="admin"
+        onEnterDashboard={() => navigateTo('dashboard')}
+        onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
+        onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
+      />
+    );
+  }
+
+  // POLICE DASHBOARD ROUTE (DEDICATED LAW ENFORCEMENT INTERFACE)
+  if (currentView === 'police-dashboard') {
+    if (officer) {
+      return (
+        <PoliceDashboard 
+          onLogout={() => navigateTo('welcome')} 
+          onNavigatePublic={navigateTo} 
+        />
+      );
+    }
+    // If not authenticated as officer, show Police Login screen
+    return (
+      <WelcomeAuthView 
+        initialPortal="police"
+        onEnterDashboard={() => navigateTo('dashboard')}
+        onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
+        onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
+      />
+    );
   }
 
   // Loading Splash Screen (only for authenticated app routes)
@@ -118,10 +183,14 @@ export const AppContent: React.FC = () => {
   }
 
   // First-visit authentication / public welcome landing flow
-  if (currentView === 'welcome') {
+  if (currentView === 'welcome' && !user && !officer && !isAdminAuthenticated) {
     return (
       <>
-        <WelcomeAuthView onEnterDashboard={() => navigateTo('dashboard')} />
+        <WelcomeAuthView 
+          onEnterDashboard={() => navigateTo('dashboard')} 
+          onEnterPoliceDashboard={() => navigateTo('police-dashboard')}
+          onEnterAdminDashboard={() => navigateTo('admin-dashboard')}
+        />
         <AccountModal 
           isOpen={accountModalOpen} 
           onClose={() => setAccountModalOpen(false)} 
@@ -146,6 +215,13 @@ export const AppContent: React.FC = () => {
 
       case 'map':
         return <FullMapPage onNavigate={navigateTo} />;
+
+      case 'crime-map':
+      case 'crime-reports':
+        return <CrimeMapView onNavigate={navigateTo} />;
+
+      case 'community-safety':
+        return <CommunitySafetyView onNavigate={navigateTo} />;
 
       case 'contacts':
         return (
@@ -182,10 +258,8 @@ export const AppContent: React.FC = () => {
 
       default:
         return <NotFoundView onNavigate={navigateTo} />;
-
     }
   };
-
 
   return (
     <>
@@ -207,7 +281,11 @@ export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <PoliceAuthProvider>
+          <AdminAuthProvider>
+            <AppContent />
+          </AdminAuthProvider>
+        </PoliceAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   );

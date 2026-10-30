@@ -3,18 +3,24 @@
  * Contains verified URLs, APK asset links, hotlines, and metadata.
  */
 
+const VERIFIED_RELEASE_APK_URL = 'https://github.com/JAGADIESH009/Women-Safety-app/releases/download/v1.1/safeher.v1.1.apk';
+const CONFIGURED_DOWNLOAD_URL = import.meta.env.VITE_APK_DOWNLOAD_URL;
+const ACTIVE_DOWNLOAD_URL = (CONFIGURED_DOWNLOAD_URL && !CONFIGURED_DOWNLOAD_URL.includes('/latest/download/SafeHer.apk'))
+  ? CONFIGURED_DOWNLOAD_URL 
+  : VERIFIED_RELEASE_APK_URL;
+
 export const APP_CONFIG = {
   name: 'SafeHer',
   tagline: "Women's Safety Application Using AI, IoT & Cloud Computing",
-  version: '1.0.0',
-  apkSize: '84.6 MB',
-  apkFilename: 'SafeHer.apk',
+  version: '1.1',
+  apkSize: '34.6 MB',
+  apkFilename: 'safeher.v1.1.apk',
   minAndroidVersion: 'Android 8.0 (Oreo) or higher',
   releaseDate: 'October 2026',
   
   // Single centrally configured download URL
-  downloadUrl: import.meta.env.VITE_APK_DOWNLOAD_URL || 'https://github.com/JAGADIESH009/Women-Safety-app/releases/latest/download/SafeHer.apk',
-  apkDownloadUrl: import.meta.env.VITE_APK_DOWNLOAD_URL || 'https://github.com/JAGADIESH009/Women-Safety-app/releases/latest/download/SafeHer.apk',
+  downloadUrl: ACTIVE_DOWNLOAD_URL,
+  apkDownloadUrl: ACTIVE_DOWNLOAD_URL,
   
   // Official Links
   githubRepoUrl: import.meta.env.VITE_GITHUB_REPO_URL || 'https://github.com/JAGADIESH009/Women-Safety-app',

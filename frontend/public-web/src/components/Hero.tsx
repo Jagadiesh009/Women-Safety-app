@@ -53,7 +53,7 @@ export const Hero: React.FC<HeroProps> = ({ onTriggerDemo, onNavigate }) => {
             <div className="hero-badge-wrap">
               <span className="badge badge-brand">
                 <Sparkles size={13} />
-                <span>Production Release v1.0.0</span>
+                <span>Production Release v{APP_CONFIG.version}</span>
               </span>
               <span className="badge badge-success">
                 <ShieldCheck size={13} />
@@ -78,7 +78,7 @@ export const Hero: React.FC<HeroProps> = ({ onTriggerDemo, onNavigate }) => {
                   download={APP_CONFIG.apkFilename}
                   className="btn btn-primary btn-lg hero-cta-btn"
                   id="hero-download-apk-button"
-                  title="Direct download SafeHer Android APK v1.0.0"
+                  title={`Direct download SafeHer Android APK v${APP_CONFIG.version}`}
                 >
                   <Download size={20} />
                   <span>Download SafeHer for Android</span>

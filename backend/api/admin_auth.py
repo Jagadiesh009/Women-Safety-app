@@ -11,8 +11,8 @@ import logging
 import bcrypt
 from jose import jwt, JWTError
 
-from database.database import SessionLocal
 from database.models import AdminUser, PasswordResetToken
+from api.deps import get_db
 
 router = APIRouter(prefix="/admin/auth", tags=["Admin Auth"])
 
@@ -20,12 +20,7 @@ SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "09d25e094faa6ca2556c818166b7a9563
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24 hours
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# get_db imported from api.deps
 
 # Schemas
 class AdminLogin(BaseModel):

@@ -25,68 +25,103 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [officer, setOfficer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [configMissing, setConfigMissing] = useState(!isFirebaseConfigured);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      // Mock login for UI testing when Firebase is not configured
-      setUser({
-        uid: 'test-user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        phone: 'Not provided',
-        bloodGroup: 'O+',
-      });
-      setLoading(false);
-      return;
-    }
+    let unsubscribe = () => {};
 
-    // Firebase Auth State Listener
-    console.log("AuthContext: setting up onAuthStateChanged listener, isFirebaseConfigured =", isFirebaseConfigured);
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log("AuthContext: onAuthStateChanged fired, firebaseUser:", firebaseUser ? firebaseUser.uid : null);
-      if (firebaseUser) {
-        let extraProfile = {};
-        try {
-          const profileStr = await AsyncStorage.getItem(`@profile_${firebaseUser.uid}`);
-          if (profileStr) {
-            extraProfile = JSON.parse(profileStr);
+    const initAuth = async () => {
+      // 1. Check if Police session is active
+      try {
+        const activeRole = await AsyncStorage.getItem('@safeher_active_role');
+        const token = await AsyncStorage.getItem('@safeher_police_token');
+        if (activeRole === 'police' && token) {
+          try {
+            const officerProfile = await api.getPoliceProfile();
+            setOfficer(officerProfile);
+            setUser(null);
+            setLoading(false);
+            return;
+          } catch (e) {
+            console.log("Police token verification failed:", e);
+            await AsyncStorage.removeItem('@safeher_police_token');
+            await AsyncStorage.removeItem('@safeher_police_officer');
+            await AsyncStorage.removeItem('@safeher_active_role');
+            setOfficer(null);
           }
-        } catch (e) {
-          console.log("Failed to load extra profile data:", e);
         }
-
-        const userData = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          name: firebaseUser.displayName || extraProfile.name || 'User',
-          phone: extraProfile.phone || firebaseUser.phoneNumber || 'Not provided',
-          bloodGroup: extraProfile.bloodGroup || 'O+',
-          medicalNotes: extraProfile.medicalNotes || '',
-          allergies: extraProfile.allergies || '',
-        };
-        setUser(userData);
-        setLoading(false); // Unblock UI immediately
-        
-        // Sync with backend (non-blocking in background)
-        try {
-          await api.syncUser({
-            email: userData.email,
-            name: userData.name !== 'User' ? userData.name : undefined,
-            phone: userData.phone !== 'Not provided' ? userData.phone : undefined,
-            blood_group: userData.bloodGroup,
-          });
-        } catch (e) {
-          console.log("Backend sync failed, but user is logged in locally:", e);
-        }
-      } else {
-        setUser(null);
-        setLoading(false);
+      } catch (e) {
+        console.log("Error checking police session:", e);
       }
-    });
 
-    return unsubscribe;
+      if (!isFirebaseConfigured) {
+        // Mock login for UI testing when Firebase is not configured
+        setUser({
+          uid: 'test-user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+          phone: 'Not provided',
+          bloodGroup: 'O+',
+        });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Firebase Auth State Listener for regular user
+      console.log("AuthContext: setting up onAuthStateChanged listener, isFirebaseConfigured =", isFirebaseConfigured);
+      unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        console.log("AuthContext: onAuthStateChanged fired, firebaseUser:", firebaseUser ? firebaseUser.uid : null);
+        // If an officer is logged in, ignore Firebase user
+        const activeRole = await AsyncStorage.getItem('@safeher_active_role');
+        if (activeRole === 'police') {
+          return;
+        }
+
+        if (firebaseUser) {
+          let extraProfile = {};
+          try {
+            const profileStr = await AsyncStorage.getItem(`@profile_${firebaseUser.uid}`);
+            if (profileStr) {
+              extraProfile = JSON.parse(profileStr);
+            }
+          } catch (e) {
+            console.log("Failed to load extra profile data:", e);
+          }
+
+          const userData = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName || extraProfile.name || 'User',
+            phone: extraProfile.phone || firebaseUser.phoneNumber || 'Not provided',
+            bloodGroup: extraProfile.bloodGroup || 'O+',
+            medicalNotes: extraProfile.medicalNotes || '',
+            allergies: extraProfile.allergies || '',
+          };
+          setUser(userData);
+          setLoading(false);
+
+          try {
+            await api.syncUser({
+              email: userData.email,
+              name: userData.name !== 'User' ? userData.name : undefined,
+              phone: userData.phone !== 'Not provided' ? userData.phone : undefined,
+              blood_group: userData.bloodGroup,
+            });
+          } catch (e) {
+            console.log("Backend sync failed, but user is logged in locally:", e);
+          }
+        } else {
+          setUser(null);
+          setLoading(false);
+        }
+      });
+    };
+
+    initAuth();
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email, password) => {
@@ -293,8 +328,63 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
   };
 
+  const policeLogin = async (badgeNumber, password) => {
+    try {
+      const res = await api.policeLogin(badgeNumber, password);
+      if (res && res.access_token) {
+        await AsyncStorage.setItem('@safeher_police_token', res.access_token);
+        await AsyncStorage.setItem('@safeher_police_officer', JSON.stringify(res.officer));
+        await AsyncStorage.setItem('@safeher_active_role', 'police');
+        setOfficer(res.officer);
+        // Cleanly isolate roles
+        if (auth.currentUser) {
+          try { await signOut(auth); } catch (e) {}
+        }
+        setUser(null);
+        return res.officer;
+      }
+      throw new Error("Invalid response from police service");
+    } catch (err) {
+      console.error("Police login error:", err);
+      throw err;
+    }
+  };
+
+  const policeLogout = async () => {
+    try {
+      if (officer?.is_on_duty) {
+        try {
+          await api.toggleDutyStatus(false);
+        } catch (e) {
+          console.warn("Could not toggle off-duty before logout:", e);
+        }
+      }
+      await AsyncStorage.removeItem('@safeher_police_token');
+      await AsyncStorage.removeItem('@safeher_police_officer');
+      await AsyncStorage.removeItem('@safeher_active_role');
+      setOfficer(null);
+    } catch (e) {
+      console.error("Police logout error:", e);
+      setOfficer(null);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, loginWithGoogle, updateUserProfile, logout, loading, configMissing }}>
+    <AuthContext.Provider value={{
+      user,
+      officer,
+      isPolice: Boolean(officer),
+      login,
+      register,
+      loginWithGoogle,
+      updateUserProfile,
+      logout,
+      policeLogin,
+      policeLogout,
+      setOfficer,
+      loading,
+      configMissing
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,7 +6,8 @@ import { initiateEmergencyCall } from '../services/emergencyCommunication';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { ScreenWrapper } from '../components/ui/ScreenWrapper';
-import { Phone, StopCircle, Radio, Clock, AlertTriangle, Navigation, CheckCircle } from 'lucide-react-native';
+import { Phone, StopCircle, Radio, Clock, AlertTriangle, Navigation, CheckCircle, Shield } from 'lucide-react-native';
+import { api } from '../services/api';
 import { useAppTheme, spacing, typography, borderRadius } from '../utils/theme';
 
 export function EmergencyActiveScreen({ navigation }) {
@@ -14,6 +15,31 @@ export function EmergencyActiveScreen({ navigation }) {
   const { location, refreshLocation } = useLocation();
   const pulseAnim = useRef(new Animated.Value(0)).current;
   const [secondsAgo, setSecondsAgo] = useState(0);
+  const [dispatchInfo, setDispatchInfo] = useState(null);
+
+  // Poll police dispatch progress from backend
+  useEffect(() => {
+    if (!activeIncident?.id) return;
+    let isMounted = true;
+
+    const checkDispatch = async () => {
+      try {
+        const info = await api.getIncidentDispatchStatus(activeIncident.id);
+        if (isMounted) {
+          setDispatchInfo(info);
+        }
+      } catch (e) {
+        // Fallback gracefully if dispatch endpoint not yet reachable
+      }
+    };
+
+    checkDispatch();
+    const timer = setInterval(checkDispatch, 3000);
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
+  }, [activeIncident?.id]);
 
   const { colors, shadows, isDark } = useAppTheme();
   const styles = useMemo(() => getStyles(colors, shadows, isDark), [colors, shadows, isDark]);
@@ -141,6 +167,44 @@ export function EmergencyActiveScreen({ navigation }) {
                 : 'Location unavailable'
               )}
             </Text>
+          </View>
+        </Card>
+
+        {/* POLICE DISPATCH PROGRESS CARD */}
+        <Card style={[styles.timelineCard, { marginBottom: spacing.lg, borderColor: '#3B82F6', borderWidth: 1 }]} variant="flat">
+          <View style={styles.timelineHeader}>
+            <Shield size={18} color="#3B82F6" />
+            <Text style={[styles.timelineTitle, { color: colors.textPrimary }]}>Police Dispatch Status</Text>
+          </View>
+          <View style={{ paddingTop: spacing.md }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: spacing.xs, justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#60A5FA' }}>
+                {dispatchInfo ? dispatchInfo.dispatch_status : 'CHECKING DISPATCH...'}
+              </Text>
+              {dispatchInfo?.assigned_officer_badge && (
+                <View style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#60A5FA' }}>
+                    {dispatchInfo.assigned_officer_badge}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <Text style={{ color: colors.textSecondary, fontSize: 12, lineHeight: 17, marginBottom: 8 }}>
+              {dispatchInfo?.message || 'Contacting police patrol dispatch system...'}
+            </Text>
+
+            {dispatchInfo?.assigned_officer_name && (
+              <View style={{ backgroundColor: isDark ? '#0A1322' : '#F1F5F9', padding: 8, borderRadius: 8, marginTop: 4 }}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textPrimary }}>
+                  Officer: {dispatchInfo.assigned_officer_name} ({dispatchInfo.assigned_officer_rank || 'Patrol Unit'})
+                </Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>
+                  Station: {dispatchInfo.assigned_officer_station || 'Bengaluru City Police'}
+                  {dispatchInfo.assigned_officer_vehicle ? ` • Vehicle: ${dispatchInfo.assigned_officer_vehicle}` : ''}
+                </Text>
+              </View>
+            )}
           </View>
         </Card>
 

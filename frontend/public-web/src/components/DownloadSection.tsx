@@ -63,10 +63,10 @@ export const DownloadSection: React.FC = () => {
                   onClick={handleDownloadClick}
                   className="btn btn-primary btn-lg download-button-prominent"
                   id="section-download-apk-button"
-                  title="Direct download SafeHer.apk"
+                  title={`Direct download ${APP_CONFIG.apkFilename}`}
                 >
                   <Download size={22} />
-                  <span>Download SafeHer.apk ({APP_CONFIG.apkSize})</span>
+                  <span>Download {APP_CONFIG.apkFilename} ({APP_CONFIG.apkSize})</span>
                 </a>
 
                 {downloadTriggered && (
@@ -104,11 +104,11 @@ export const DownloadSection: React.FC = () => {
                 <div className="specs-table">
                   <div className="spec-row">
                     <span className="spec-name">Asset File</span>
-                    <span className="spec-val font-mono">SafeHer.apk</span>
+                    <span className="spec-val font-mono">{APP_CONFIG.apkFilename}</span>
                   </div>
                   <div className="spec-row">
                     <span className="spec-name">Release Version</span>
-                    <span className="spec-val font-mono">v1.0.0 (Production)</span>
+                    <span className="spec-val font-mono">v{APP_CONFIG.version} (Production)</span>
                   </div>
                   <div className="spec-row">
                     <span className="spec-name">File Size</span>
@@ -157,7 +157,7 @@ export const DownloadSection: React.FC = () => {
               <div className="step-badge">Step 1</div>
               <h4 className="font-semibold text-base mb-2">Download APK</h4>
               <p className="text-xs text-secondary">
-                Tap the download button above to retrieve <code>SafeHer.apk</code> directly to your device storage.
+                Tap the download button above to retrieve <code>{APP_CONFIG.apkFilename}</code> directly to your device storage.
               </p>
             </div>
 

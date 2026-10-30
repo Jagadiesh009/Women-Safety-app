@@ -1,0 +1,26 @@
+# Root .vercelignore for safeher-public-website monorepo deployment
+
+backend/
+frontend/mobile/
+frontend/admin/
+database/
+deployment/
+docker/
+docs/
+tests/
+.git/
+.agents/
+.pytest_cache/
+venv/
+env/
+node_modules/
+frontend/public-web/node_modules/
+frontend/mobile/node_modules/
+frontend/mobile/android/
+*.apk
+*.keystore
+*.log
+*.txt
+*.db
+*.sqlite3
+*.b64

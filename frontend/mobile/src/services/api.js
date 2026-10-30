@@ -1,27 +1,61 @@
 import { auth } from '../config/firebase';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Multi-tier API endpoints for extreme connection resilience:
 // 1. Local over adb reverse (127.0.0.1:8000)
-// 2. Production cloud backend (https://women-safety-app-xo2h.onrender.com)
+// 2. Android emulator host loopback (10.0.2.2:8000)
+// 3. Local machine Wi-Fi / LAN IP (10.222.5.225:8000)
+// 4. Production cloud backend (https://women-safety-app-xo2h.onrender.com)
 const CLOUD_API_URL = 'https://women-safety-app-xo2h.onrender.com';
-const LOCAL_API_URL = Platform.OS === 'android' ? 'http://192.168.0.131:8000' : 'http://localhost:8000';
+const CANDIDATE_URLS = [
+    process.env.EXPO_PUBLIC_API_URL,
+    'http://127.0.0.1:8000',
+    'http://10.0.2.2:8000',
+    'http://10.222.5.225:8000',
+    CLOUD_API_URL
+].filter(Boolean);
 
-const getInitialBaseUrl = () => {
-    if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
-    return __DEV__ ? LOCAL_API_URL : CLOUD_API_URL;
-};
-
-let activeBaseUrl = getInitialBaseUrl();
+let activeBaseUrl = CANDIDATE_URLS[0] || 'http://127.0.0.1:8000';
 console.log('[API Config] Initial base URL:', activeBaseUrl);
 
-// Helper to get fresh token and configure headers
-const getHeaders = async () => {
+// Helper to get fresh token and configure headers for either user or police officer
+const getHeaders = async (endpoint = '') => {
+    // 1. Police endpoints
+    if (endpoint.startsWith('/police')) {
+        if (endpoint === '/police/auth/login') {
+            return { 'Content-Type': 'application/json' };
+        }
+        const policeToken = await AsyncStorage.getItem('@safeher_police_token');
+        if (!policeToken) {
+            throw new Error("No authorized police officer token found.");
+        }
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${policeToken}`
+        };
+    }
+
+    // 2. Public / semi-public crime and community endpoints
+    const isPublic = endpoint.startsWith('/crime') || endpoint.startsWith('/community');
     const user = auth.currentUser;
+
     if (!user) {
+        if (isPublic) {
+            // Check if police token is available
+            const policeToken = await AsyncStorage.getItem('@safeher_police_token');
+            if (policeToken) {
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${policeToken}`
+                };
+            }
+            return { 'Content-Type': 'application/json' };
+        }
         throw new Error("No authenticated user found for API request.");
     }
-    // Get fresh token (true = force refresh if needed)
+
+    // 3. Authenticated SafeHer user
     const token = await user.getIdToken();
     return {
         'Content-Type': 'application/json',
@@ -76,9 +110,9 @@ const executeFetch = async (baseUrl, endpoint, options, headers) => {
     }
 };
 
-// Generic API caller with resilient automatic cloud / local fallback
+// Generic API caller with resilient automatic candidate endpoint fallback
 const fetchApi = async (endpoint, options = {}) => {
-    const headers = await getHeaders();
+    const headers = await getHeaders(endpoint);
 
     // 1. First attempt with active base URL
     try {
@@ -89,25 +123,25 @@ const fetchApi = async (endpoint, options = {}) => {
         const isConnectionErr = primaryErrMsg.includes('connect') || 
                                 primaryErrMsg.includes('network') || 
                                 primaryErrMsg.includes('failed to fetch') ||
-                                primaryErrMsg.includes('aborted');
+                                primaryErrMsg.includes('aborted') ||
+                                primaryErrMsg.includes('canceled');
 
-        // If it was a network/connection failure, attempt fallback immediately
-        const fallbackUrl = activeBaseUrl === LOCAL_API_URL ? CLOUD_API_URL : LOCAL_API_URL;
+        // If it was a network/connection failure, cycle through candidate endpoints
         if (isConnectionErr) {
-            console.warn(`[API Fallback] ${activeBaseUrl} failed (${primaryErr.message}). Retrying on ${fallbackUrl}...`);
-            try {
-                const fallbackRes = await executeFetch(fallbackUrl, endpoint, options, headers);
-                // Remember the working endpoint
-                activeBaseUrl = fallbackUrl;
-                console.log(`[API Fallback] Switched activeBaseUrl to ${fallbackUrl}`);
-                return fallbackRes.data;
-            } catch (fallbackErr) {
-                console.error(`[API Error] Both endpoints failed for ${endpoint}`);
+            for (const candidate of CANDIDATE_URLS) {
+                if (candidate === activeBaseUrl) continue;
+                try {
+                    const fallbackRes = await executeFetch(candidate, endpoint, options, headers);
+                    activeBaseUrl = candidate;
+                    console.log(`[API Fallback] Switched activeBaseUrl to ${candidate}`);
+                    return fallbackRes.data;
+                } catch (candidateErr) {
+                    // Try next candidate
+                }
             }
+            console.error(`[API Error] All candidate endpoints failed for ${endpoint}`);
         }
 
-        // Re-throw or format error
-        const msg = primaryErr.message ? primaryErr.message.toLowerCase() : '';
         const isAuthOrNotFound = primaryErr.status === 404 || primaryErr.status === 403;
         if (isConnectionErr || isAuthOrNotFound) {
             console.warn(`[API Warning] ${endpoint}:`, primaryErr.message);
@@ -168,6 +202,7 @@ export const api = {
         method: 'PUT',
         body: JSON.stringify(incidentData)
     }),
+    getIncidentDispatchStatus: (incidentId) => fetchApi(`/incidents/${incidentId}/dispatch-status`),
 
     // Location endpoints
     addLocation: (incidentId, locationData) => fetchApi(`/locations/${incidentId}`, {
@@ -195,4 +230,81 @@ export const api = {
         const accParam = accuracy ? `&accuracy=${accuracy}` : '';
         return fetchApi(`/locations/safety-score?latitude=${latitude}&longitude=${longitude}${accParam}`);
     },
+
+    // ========================================================================
+    // POLICE OFFICER ENDPOINTS
+    // ========================================================================
+    policeLogin: (badgeNumber, password) => fetchApi('/police/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ badge_number: badgeNumber, password: password })
+    }),
+    getPoliceProfile: () => fetchApi('/police/auth/me'),
+
+    // Duty Status & Location
+    toggleDutyStatus: (isOnDuty, patrolZone = null, vehicleNumber = null) => fetchApi('/police/duty/toggle', {
+        method: 'POST',
+        body: JSON.stringify({ is_on_duty: isOnDuty, patrol_zone: patrolZone, vehicle_number: vehicleNumber })
+    }),
+    getDutyStatus: () => fetchApi('/police/duty/status'),
+    updatePatrolLocation: (locationData) => fetchApi('/police/patrol/location', {
+        method: 'POST',
+        body: JSON.stringify(locationData)
+    }),
+    getActivePatrolUnits: () => fetchApi('/police/patrol/active-units'),
+
+    // Incoming Alerts & Response
+    getIncomingAlerts: () => fetchApi('/police/alerts'),
+    acceptAlert: (incidentId) => fetchApi(`/police/alerts/${incidentId}/accept`, {
+        method: 'POST'
+    }),
+    declineAlert: (incidentId) => fetchApi(`/police/alerts/${incidentId}/decline`, {
+        method: 'POST'
+    }),
+    updateIncidentStatus: (incidentId, status, notes = null) => fetchApi(`/police/incidents/${incidentId}/status`, {
+        method: 'POST',
+        body: JSON.stringify({ status: status, notes: notes })
+    }),
+    getActivePoliceIncident: () => fetchApi('/police/incidents/active'),
+    getPoliceIncidentHistory: () => fetchApi('/police/incidents/history'),
+
+    // Area Patrol Recommendations & Assignments (Features 4 & 6)
+    getPatrolRecommendations: () => fetchApi('/police/patrol/recommendations'),
+    assignPatrolRecommendation: (recId, officerId, instructions = null, shiftPeriod = null) => fetchApi(`/police/patrol/recommendations/${recId}/assign`, {
+        method: 'POST',
+        body: JSON.stringify({ officer_id: officerId, instructions: instructions, shift_period: shiftPeriod })
+    }),
+    getMyPatrolAssignments: () => fetchApi('/police/patrol/my-assignments'),
+    updatePatrolAssignmentStatus: (assignmentId, status) => fetchApi(`/police/patrol/assignments/${assignmentId}/status`, {
+        method: 'POST',
+        body: JSON.stringify({ status: status })
+    }),
+
+    // ========================================================================
+    // CRIME SEARCH & WEEKLY REPORTS (Features 1 & 2)
+    // ========================================================================
+    searchCrime: (query = null, category = null, startDate = null, endDate = null) => {
+        let params = [];
+        if (query) params.push(`query=${encodeURIComponent(query)}`);
+        if (category && category !== 'All') params.push(`category=${encodeURIComponent(category)}`);
+        if (startDate) params.push(`start_date=${encodeURIComponent(startDate)}`);
+        if (endDate) params.push(`end_date=${encodeURIComponent(endDate)}`);
+        const qs = params.length > 0 ? `?${params.join('&')}` : '';
+        return fetchApi(`/crime/search${qs}`);
+    },
+    getLocalitiesCrimeSummary: () => fetchApi('/crime/localities'),
+    getWeeklyCrimeReport: (offsetWeeks = 0) => fetchApi(`/crime/weekly-report?date_offset_weeks=${offsetWeeks}`),
+    getWeeklyReportPdfUrl: () => `${activeBaseUrl}/crime/weekly-report/pdf`,
+
+    // ========================================================================
+    // COMMUNITY AREA SAFETY & ALERTS (Features 3 & 5)
+    // ========================================================================
+    getCommunitySafetyMap: () => fetchApi('/community/safety-map'),
+    getCommunityAlerts: (locality = null) => {
+        const qs = locality ? `?locality=${encodeURIComponent(locality)}` : '';
+        return fetchApi(`/community/alerts${qs}`);
+    },
+    publishCommunityAlert: (alertData) => fetchApi('/community/alerts', {
+        method: 'POST',
+        body: JSON.stringify(alertData)
+    }),
 };

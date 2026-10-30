@@ -20,9 +20,9 @@ This frontend is independently configured and deployed from the Safety Operation
 
 1. **Direct Android APK Download**:
    - Centrally configured in `src/config/appConfig.ts`:
-     `https://github.com/JAGADIESH009/Women-Safety-app/releases/latest/download/SafeHer.apk`
+     `https://github.com/JAGADIESH009/Women-Safety-app/releases/download/v1.1/safeher.v1.1.apk`
    - Direct download links near the Hero and in the dedicated Download section without intermediate repository or dashboard hops.
-   - Comprehensive release specifications (v1.0.0, 84.6 MB, Android 8.0+).
+   - Comprehensive release specifications (v1.1, 34.6 MB, Android 8.0+).
    - 4-step installation guide with clear explanation of Android browser install permissions.
 
 2. **Interactive Safety Sandbox**:

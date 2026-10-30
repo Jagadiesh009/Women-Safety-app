@@ -1,8 +1,41 @@
 import { auth } from '../config/firebase';
-import type { EmergencyContact, UserProfile, IncidentReport } from '../types';
+import type { 
+  EmergencyContact, 
+  UserProfile, 
+  IncidentReport,
+  PoliceOfficerProfile,
+  DutyStatusData,
+  IncomingAlertItem,
+  PoliceIncidentDetail,
+  PatrolUnitMarker,
+  PatrolRecommendationItem,
+  PatrolAssignmentItem,
+  CrimeIncidentSummary,
+  LocalityCrimeSummaryItem,
+  WeeklyCrimeReportData,
+  CommunitySafetyLocality,
+  CommunityAlertItem,
+  AdminUser,
+  AdminComprehensiveStats,
+  AdminOfficerItem,
+  AdminOfficerCreatePayload,
+  AdminCrimeReportItem,
+  AdminAdvisoryPayload,
+  AdminAdvisoryItem,
+  AdminPatrolRecommendation
+} from '../types';
 
-export const API_BASE_URL = 
-  import.meta.env.VITE_API_URL || 'https://women-safety-app-xo2h.onrender.com';
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:8000';
+  }
+  return 'https://women-safety-app-xo2h.onrender.com';
+};
+
+export const API_BASE_URL = getApiBaseUrl();
 
 const getUserStorageKey = (prefix: string, uid?: string | null): string => {
   if (!uid) return '';
@@ -38,6 +71,32 @@ const getAuthHeaders = async (): Promise<Record<string, string>> => {
   }
   return headers;
 };
+
+export const getPoliceAuthHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = localStorage.getItem('safeher_police_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
+export const getAdminAuthHeaders = (): Record<string, string> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = localStorage.getItem('safeher_admin_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
+// ============================================================================
+// CORE USER & INCIDENT API
+// ============================================================================
 
 export const api = {
   async checkHealth(): Promise<{ status: string; online: boolean }> {
@@ -155,7 +214,6 @@ export const api = {
   // --- Contacts ---
   async getContacts(): Promise<EmergencyContact[]> {
     if (!auth?.currentUser) {
-      // Guests strictly have 0 personal contacts
       return [];
     }
 
@@ -197,7 +255,6 @@ export const api = {
           return deduped;
         }
       } else if (res.status === 404) {
-        // User profile might not exist on backend yet. Sync profile and retry once.
         await this.syncUser({
           email: auth.currentUser.email || '',
           name: auth.currentUser.displayName || '',
@@ -221,7 +278,6 @@ export const api = {
       }
     } catch (err) {
       console.warn('[SafeHer API] Contacts remote fetch warning:', err);
-      // Fallback only to this authenticated user's cached contacts
       const cached = localStorage.getItem(getUserStorageKey('contacts', uid));
       if (cached) {
         try {
@@ -265,8 +321,7 @@ export const api = {
       throw new Error(`Failed to create contact (${res.status}): ${errorText}`);
     }
 
-    const created = await res.json();
-    return created;
+    return await res.json();
   },
 
   async updateContact(
@@ -293,8 +348,7 @@ export const api = {
       throw new Error(`Failed to update contact (${res.status}): ${errorText}`);
     }
 
-    const updated = await res.json();
-    return updated;
+    return await res.json();
   },
 
   async deleteContact(id: number | string): Promise<boolean> {
@@ -353,4 +407,563 @@ export const api = {
     }
     return [];
   },
+};
+
+// ============================================================================
+// POLICE OFFICER PORTAL API
+// ============================================================================
+
+export const policeApi = {
+  async login(badgeNumber: string, password: string): Promise<{
+    access_token: string;
+    token_type: string;
+    officer: PoliceOfficerProfile;
+  }> {
+    const res = await fetch(`${API_BASE_URL}/police/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        badge_number: badgeNumber.trim(),
+        password: password
+      })
+    });
+
+    if (!res.ok) {
+      let message = 'Failed to authenticate officer';
+      try {
+        const errorJson = await res.json();
+        if (errorJson.detail) {
+          message = typeof errorJson.detail === 'string' ? errorJson.detail : JSON.stringify(errorJson.detail);
+        }
+      } catch {
+        const text = await res.text();
+        if (text) message = text;
+      }
+      throw new Error(message);
+    }
+
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('safeher_police_token', data.access_token);
+      localStorage.setItem('safeher_police_officer', JSON.stringify(data.officer));
+    }
+    return data;
+  },
+
+  async getMe(): Promise<PoliceOfficerProfile> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/auth/me`, { headers });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch officer profile (${res.status})`);
+    }
+    const data = await res.json();
+    localStorage.setItem('safeher_police_officer', JSON.stringify(data));
+    return data;
+  },
+
+  async toggleDuty(
+    isOnDuty: boolean, 
+    patrolZone?: string, 
+    vehicleNumber?: string
+  ): Promise<DutyStatusData> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/duty/toggle`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        is_on_duty: isOnDuty,
+        patrol_zone: patrolZone,
+        vehicle_number: vehicleNumber
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Duty toggle failed (${res.status}): ${err}`);
+    }
+    return await res.json();
+  },
+
+  async getDutyStatus(): Promise<DutyStatusData> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/duty/status`, { headers });
+    if (!res.ok) {
+      throw new Error(`Failed to get duty status (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async updatePatrolLocation(coords: {
+    latitude: number;
+    longitude: number;
+    accuracy?: number;
+    speed?: number;
+    heading?: number;
+  }): Promise<{ status: string; timestamp: string }> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/patrol/location`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(coords)
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update patrol coordinates: ${res.status}`);
+    }
+    return await res.json();
+  },
+
+  async getActivePatrolUnits(): Promise<PatrolUnitMarker[]> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/patrol/active-units`, { headers });
+    if (!res.ok) {
+      return [];
+    }
+    return await res.json();
+  },
+
+  async getIncomingAlerts(): Promise<IncomingAlertItem[]> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/alerts`, { headers });
+    if (!res.ok) {
+      return [];
+    }
+    return await res.json();
+  },
+
+  async acceptAlert(incidentId: number): Promise<{
+    status: string;
+    message: string;
+    incident_id: number;
+    dispatch_status: string;
+  }> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/alerts/${incidentId}/accept`, {
+      method: 'POST',
+      headers
+    });
+    if (!res.ok) {
+      let detail = 'Failed to accept alert';
+      try {
+        const errJson = await res.json();
+        if (errJson.detail) detail = errJson.detail;
+      } catch {
+        detail = await res.text();
+      }
+      throw new Error(detail);
+    }
+    return await res.json();
+  },
+
+  async declineAlert(incidentId: number): Promise<{ status: string; message: string }> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/alerts/${incidentId}/decline`, {
+      method: 'POST',
+      headers
+    });
+    if (!res.ok) {
+      throw new Error(`Decline failed: ${res.status}`);
+    }
+    return await res.json();
+  },
+
+  async updateIncidentStatus(
+    incidentId: number, 
+    status: string, 
+    notes?: string
+  ): Promise<{ status: string; incident_id: number; dispatch_status: string; notes?: string }> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/incidents/${incidentId}/status`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ status, notes })
+    });
+    if (!res.ok) {
+      let detail = 'Failed to update response status';
+      try {
+        const j = await res.json();
+        if (j.detail) detail = j.detail;
+      } catch {
+        detail = await res.text();
+      }
+      throw new Error(detail);
+    }
+    return await res.json();
+  },
+
+  async getActiveIncident(): Promise<PoliceIncidentDetail | null> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/incidents/active`, { headers });
+    if (!res.ok) return null;
+    return await res.json();
+  },
+
+  async getIncidentHistory(): Promise<PoliceIncidentDetail[]> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/incidents/history`, { headers });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async getPatrolRecommendations(): Promise<PatrolRecommendationItem[]> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/patrol/recommendations`, { headers });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async assignPatrolRecommendation(
+    recommendationId: number,
+    payload: {
+      officer_id: number;
+      shift_period?: string;
+      instructions?: string;
+    }
+  ): Promise<PatrolAssignmentItem> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/patrol/recommendations/${recommendationId}/assign`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Patrol assignment failed (${res.status}): ${err}`);
+    }
+    return await res.json();
+  },
+
+  async getMyPatrolAssignments(): Promise<PatrolAssignmentItem[]> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/police/patrol/my-assignments`, { headers });
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  logout(): void {
+    localStorage.removeItem('safeher_police_token');
+    localStorage.removeItem('safeher_police_officer');
+  }
+};
+
+// ============================================================================
+// CRIME ANALYTICS & INTELLIGENCE API
+// ============================================================================
+
+export const crimeApi = {
+  async search(params: {
+    city?: string;
+    locality?: string;
+    area?: string;
+    pincode?: string;
+    category?: string;
+    days?: number;
+    verified_only?: boolean;
+    start_date?: string;
+    end_date?: string;
+  }): Promise<{
+    total_found: number;
+    verified_count: number;
+    unverified_count: number;
+    locality_searched?: string;
+    incidents: CrimeIncidentSummary[];
+    breakdown_by_category: Record<string, number>;
+  }> {
+    const query = new URLSearchParams();
+    if (params.city) query.append('city', params.city);
+    if (params.locality) query.append('locality', params.locality);
+    if (params.area) query.append('area', params.area);
+    if (params.pincode) query.append('pincode', params.pincode);
+    if (params.category && params.category !== 'All') query.append('category', params.category);
+    if (params.days) query.append('days', params.days.toString());
+    if (params.verified_only !== undefined) query.append('verified_only', params.verified_only.toString());
+    if (params.start_date) query.append('start_date', params.start_date);
+    if (params.end_date) query.append('end_date', params.end_date);
+
+    const res = await fetch(`${API_BASE_URL}/crime/search?${query.toString()}`);
+    if (!res.ok) {
+      throw new Error(`Crime search failed (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async getLocalities(): Promise<LocalityCrimeSummaryItem[]> {
+    const res = await fetch(`${API_BASE_URL}/crime/localities`);
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async getWeeklyReport(weeksAgo = 0): Promise<WeeklyCrimeReportData> {
+    const res = await fetch(`${API_BASE_URL}/crime/weekly-report?weeks_ago=${weeksAgo}`);
+    if (!res.ok) {
+      throw new Error(`Failed to load weekly crime report (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  getWeeklyReportPdfUrl(weeksAgo = 0): string {
+    return `${API_BASE_URL}/crime/weekly-report/pdf?weeks_ago=${weeksAgo}`;
+  }
+};
+
+// ============================================================================
+// COMMUNITY RADAR & SAFETY MAP API
+// ============================================================================
+
+export const communityApi = {
+  async getSafetyMap(): Promise<CommunitySafetyLocality[]> {
+    const res = await fetch(`${API_BASE_URL}/community/safety-map`);
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async getAlerts(locality?: string): Promise<CommunityAlertItem[]> {
+    const url = locality 
+      ? `${API_BASE_URL}/community/alerts?locality=${encodeURIComponent(locality)}` 
+      : `${API_BASE_URL}/community/alerts`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    return await res.json();
+  },
+
+  async createAlert(payload: {
+    title: string;
+    locality: string;
+    category: string;
+    description: string;
+    severity?: 'HIGH' | 'MEDIUM' | 'LOW';
+  }): Promise<CommunityAlertItem> {
+    const headers = getPoliceAuthHeaders();
+    const res = await fetch(`${API_BASE_URL}/community/alerts`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to publish community safety advisory (${res.status})`);
+    }
+    return await res.json();
+  }
+};
+
+// ============================================================================
+// ADMINISTRATOR COMMAND CENTER API
+// ============================================================================
+
+export const adminApi = {
+  async login(admin_id: string, password: string): Promise<{ access_token: string; token_type: string }> {
+    const res = await fetch(`${API_BASE_URL}/admin/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ admin_id, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Invalid Administrator ID or password.');
+    }
+    return await res.json();
+  },
+
+  async getMe(): Promise<AdminUser> {
+    const res = await fetch(`${API_BASE_URL}/admin/me`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error('Admin authorization expired or invalid.');
+    }
+    return await res.json();
+  },
+
+  async getStats(): Promise<AdminComprehensiveStats> {
+    const res = await fetch(`${API_BASE_URL}/admin/stats`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load administrator statistics (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async getOfficers(): Promise<AdminOfficerItem[]> {
+    const res = await fetch(`${API_BASE_URL}/admin/officers`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load police officers (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async createOfficer(payload: AdminOfficerCreatePayload): Promise<AdminOfficerItem> {
+    const res = await fetch(`${API_BASE_URL}/admin/officers`, {
+      method: 'POST',
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to provision officer (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async toggleOfficerStatus(officerId: number, isActive: boolean): Promise<{ id: number; is_active: boolean; message: string }> {
+    const res = await fetch(`${API_BASE_URL}/admin/officers/${officerId}/status`, {
+      method: 'PUT',
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify({ is_active: isActive })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to update officer status (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async updateOfficer(officerId: number, payload: Partial<AdminOfficerCreatePayload>): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/admin/officers/${officerId}`, {
+      method: 'PUT',
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to update officer details (${res.status})`);
+    }
+  },
+
+  async getCrimeReports(verifiedOnly = false, locality?: string, limit = 100): Promise<AdminCrimeReportItem[]> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (verifiedOnly) params.append('verified_only', 'true');
+    if (locality) params.append('locality', locality);
+    
+    const res = await fetch(`${API_BASE_URL}/admin/crime-reports?${params.toString()}`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load crime reports (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async verifyCrimeReport(incidentId: number, isVerified: boolean): Promise<{ id: number; is_verified: boolean; message: string }> {
+    const res = await fetch(`${API_BASE_URL}/admin/crime-reports/${incidentId}/verify`, {
+      method: 'PUT',
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify({ is_verified: isVerified })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to verify incident (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async getIncidents(status?: string): Promise<any[]> {
+    const url = status 
+      ? `${API_BASE_URL}/admin/incidents?status=${encodeURIComponent(status)}`
+      : `${API_BASE_URL}/admin/incidents`;
+    const res = await fetch(url, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load incidents (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async resolveIncident(incidentId: number): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/admin/incidents/${incidentId}/resolve`, {
+      method: 'POST',
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to resolve incident (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async resolveAllIncidents(): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/admin/incidents/resolve-all`, {
+      method: 'POST',
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to resolve incidents (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async getAdvisories(): Promise<AdminAdvisoryItem[]> {
+    const res = await fetch(`${API_BASE_URL}/admin/advisories`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load advisories (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async publishAdvisory(payload: AdminAdvisoryPayload): Promise<AdminAdvisoryItem> {
+    const res = await fetch(`${API_BASE_URL}/admin/advisories`, {
+      method: 'POST',
+      headers: getAdminAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to publish advisory (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async toggleAdvisory(advisoryId: number): Promise<{ id: number; is_active: boolean; message: string }> {
+    const res = await fetch(`${API_BASE_URL}/admin/advisories/${advisoryId}/toggle`, {
+      method: 'PUT',
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to toggle advisory (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async deleteAdvisory(advisoryId: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/admin/advisories/${advisoryId}`, {
+      method: 'DELETE',
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to delete advisory (${res.status})`);
+    }
+  },
+
+  async getPatrolRecommendations(): Promise<AdminPatrolRecommendation[]> {
+    const res = await fetch(`${API_BASE_URL}/admin/patrol-recommendations`, {
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load patrol recommendations (${res.status})`);
+    }
+    return await res.json();
+  },
+
+  async approvePatrolRecommendation(recId: number, officerId?: number, instructions?: string): Promise<any> {
+    const params = new URLSearchParams();
+    if (officerId) params.append('officer_id', String(officerId));
+    if (instructions) params.append('instructions', instructions);
+
+    const res = await fetch(`${API_BASE_URL}/admin/patrol-recommendations/${recId}/approve?${params.toString()}`, {
+      method: 'POST',
+      headers: getAdminAuthHeaders()
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Failed to approve recommendation (${res.status})`);
+    }
+    return await res.json();
+  }
 };

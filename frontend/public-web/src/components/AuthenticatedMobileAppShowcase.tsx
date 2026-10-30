@@ -62,13 +62,13 @@ export const AuthenticatedMobileAppShowcase: React.FC = () => {
               href={APP_CONFIG.apkDownloadUrl}
               download={APP_CONFIG.apkFilename}
               className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#A61945] hover:bg-[#8C1338] text-white text-xs font-semibold tracking-wide transition-all duration-200 active:scale-[0.98] shadow-sm cursor-pointer"
-              title="Download SafeHer for Android"
+              title={`Download SafeHer for Android (${APP_CONFIG.apkSize})`}
             >
               <Download size={16} />
               <span>Download for Android (APK)</span>
             </a>
             <div className="text-[11px] text-[#81747D] mt-2">
-              Version 1.0.0 • 84.6 MB APK • Compatible with Android 8.0+
+              Version {APP_CONFIG.version} • {APP_CONFIG.apkSize} APK • Compatible with Android 8.0+
             </div>
           </div>
         </div>

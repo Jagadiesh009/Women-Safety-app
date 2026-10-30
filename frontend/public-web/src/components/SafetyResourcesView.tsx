@@ -207,10 +207,12 @@ export const SafetyResourcesView: React.FC<SafetyResourcesViewProps> = () => {
 
         <a
           href={APP_CONFIG.downloadUrl}
+          download={APP_CONFIG.apkFilename}
           className="w-full sm:w-auto py-3 px-6 rounded-xl bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white font-semibold text-xs transition-colors shrink-0 flex items-center justify-center gap-2 shadow-xs"
+          title={`Download ${APP_CONFIG.apkFilename} (${APP_CONFIG.apkSize})`}
         >
           <Download className="w-4 h-4" />
-          <span>Download SafeHer.apk</span>
+          <span>Download {APP_CONFIG.apkFilename}</span>
         </a>
       </div>
 

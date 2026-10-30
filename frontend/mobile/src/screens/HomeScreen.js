@@ -14,7 +14,7 @@ import { LiveLocationShareCard } from '../components/LiveLocationShareCard';
 import { LocationSafetyCard } from '../components/LocationSafetyCard';
 import { motionDetector } from '../services/motionDetector';
 import { voiceDetector } from '../services/voiceDetector';
-import { ShieldCheck, Users, PhoneCall, AlertTriangle, Activity, ShieldAlert, ChevronRight, CheckCircle, RefreshCw } from 'lucide-react-native';
+import { ShieldCheck, Users, PhoneCall, AlertTriangle, Activity, ShieldAlert, ChevronRight, CheckCircle, RefreshCw, MapPin, Shield } from 'lucide-react-native';
 import { useAppTheme, spacing, typography, borderRadius } from '../utils/theme';
 
 const normalizePhone = (phone) => {
@@ -342,6 +342,18 @@ export function HomeScreen({ navigation }) {
             colors={colors}
           />
           <ActionBtn 
+            icon={<MapPin size={24} color="#38BDF8" />} 
+            label="Crime Map" 
+            onPress={() => navigation.navigate('CrimeSearch')}
+            colors={colors}
+          />
+          <ActionBtn 
+            icon={<Shield size={24} color="#10B981" />} 
+            label="Safety Map" 
+            onPress={() => navigation.navigate('CommunitySafety')}
+            colors={colors}
+          />
+          <ActionBtn 
             icon={<PhoneCall size={24} color={colors.textPrimary} />} 
             label="Fake Call" 
             onPress={() => navigation.navigate('FakeCall')}
@@ -364,6 +376,18 @@ export function HomeScreen({ navigation }) {
             icon={<Users size={24} color={colors.accentBrand} />} 
             label="Contacts" 
             onPress={() => navigation.navigate('Contacts')}
+            colors={colors}
+          />
+          <ActionBtn 
+            icon={<MapPin size={24} color="#38BDF8" />} 
+            label="Crime Map" 
+            onPress={() => navigation.navigate('CrimeSearch')}
+            colors={colors}
+          />
+          <ActionBtn 
+            icon={<Shield size={24} color="#10B981" />} 
+            label="Safety Map" 
+            onPress={() => navigation.navigate('CommunitySafety')}
             colors={colors}
           />
           <ActionBtn 

@@ -81,19 +81,38 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             href={APP_CONFIG.apkDownloadUrl}
             download={APP_CONFIG.apkFilename}
             className="inline-flex items-center gap-1 hover:text-[var(--brand-primary)] transition-colors font-medium text-[var(--text-primary)]"
-            title="Download Android APK (84.6 MB)"
+            title={`Download Android APK (${APP_CONFIG.apkSize})`}
           >
             <Smartphone size={11} className="text-[var(--brand-primary)]" />
             <span>Android APK</span>
           </a>
         </div>
 
-        {/* Project Credits */}
-        <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
-          <span>SafeHer Platform</span>
-          <span>•</span>
+        {/* Project Credits / Built By */}
+        <div className="flex flex-col sm:flex-row items-center gap-2 text-[11px] text-[var(--text-muted)]">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[var(--text-secondary)] font-medium">Built by</span>
+            <a 
+              href="https://github.com/JAGADIESH009" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="font-semibold text-[var(--text-primary)] hover:text-[var(--brand-primary)] transition-colors underline decoration-[var(--border-medium)] hover:decoration-[var(--brand-primary)] underline-offset-2"
+            >
+              Jagadiesh R
+            </a>
+            <span>&amp;</span>
+            <a 
+              href="https://github.com/Bhagyaashreee" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="font-semibold text-[var(--text-primary)] hover:text-[var(--brand-primary)] transition-colors underline decoration-[var(--border-medium)] hover:decoration-[var(--brand-primary)] underline-offset-2"
+            >
+              Bhagyaashree
+            </a>
+          </div>
+          <span className="hidden sm:inline text-[var(--text-muted)]">•</span>
           <a 
-            href="https://github.com/JAGADIESH009/Women-Safety-app" 
+            href={APP_CONFIG.githubRepoUrl} 
             target="_blank" 
             rel="noopener noreferrer" 
             className="inline-flex items-center gap-1 font-medium text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition-colors"

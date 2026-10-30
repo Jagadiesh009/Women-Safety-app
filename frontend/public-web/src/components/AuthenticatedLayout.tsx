@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { Footer } from './Footer';
 import type { PageView } from '../types';
 
 interface AuthenticatedLayoutProps {
@@ -248,6 +249,9 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({
         <main className="flex-1 p-6 lg:p-8 max-w-[1440px] w-full mx-auto">
           {children}
         </main>
+
+        {/* Global Layout Footer with Project Credits */}
+        <Footer onNavigate={onNavigate} />
       </div>
     </div>
   );

@@ -4,20 +4,28 @@ import { useAuth } from '../context/AuthContext';
 import { ScreenWrapper } from '../components/ui/ScreenWrapper';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { ShieldCheck, AlertTriangle, Mail, Lock } from 'lucide-react-native';
+import { ShieldCheck, AlertTriangle, Mail, Lock, Shield, BadgeCheck, Radio } from 'lucide-react-native';
 import { useAppTheme, spacing, typography, borderRadius } from '../utils/theme';
 
 export function LoginScreen({ navigation }) {
+  const [loginMode, setLoginMode] = useState('user'); // 'user' | 'police'
+  
+  // User login states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Police login states
+  const [badgeNumber, setBadgeNumber] = useState('');
+  const [policePassword, setPolicePassword] = useState('');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const { login, loginWithGoogle, configMissing } = useAuth();
+  const { login, loginWithGoogle, policeLogin, configMissing } = useAuth();
   
   const { colors, shadows, isDark } = useAppTheme();
-  const styles = useMemo(() => getStyles(colors, shadows, isDark), [colors, shadows, isDark]);
+  const styles = useMemo(() => getStyles(colors, shadows, isDark, loginMode), [colors, shadows, isDark, loginMode]);
 
-  const handleLogin = async () => {
+  const handleUserLogin = async () => {
     if (!email || !password) {
       setErrorMsg("Please enter email and password");
       return;
@@ -29,6 +37,23 @@ export function LoginScreen({ navigation }) {
       await login(email, password);
     } catch (err) {
       setErrorMsg(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePoliceLogin = async () => {
+    if (!badgeNumber || !policePassword) {
+      setErrorMsg("Please enter Officer Badge ID and Password");
+      return;
+    }
+
+    setErrorMsg('');
+    setIsSubmitting(true);
+    try {
+      await policeLogin(badgeNumber.trim(), policePassword);
+    } catch (err) {
+      setErrorMsg(err.message || 'Police login failed. Verify officer credentials and authorization.');
     } finally {
       setIsSubmitting(false);
     }
@@ -54,102 +79,190 @@ export function LoginScreen({ navigation }) {
         
         <View style={styles.header}>
           <View style={styles.brandContainer}>
-            <View style={styles.iconContainer}>
-              <Image source={require('../../assets/icon.png')} style={styles.logoImage} />
+            <View style={[styles.iconContainer, loginMode === 'police' && styles.iconContainerPolice]}>
+              {loginMode === 'police' ? (
+                <Shield size={24} color="#60A5FA" />
+              ) : (
+                <Image source={require('../../assets/icon.png')} style={styles.logoImage} />
+              )}
             </View>
             <Text style={styles.brandTitle}>SafeHer</Text>
           </View>
-          <Text style={styles.subtitle}>Your safety, always within reach.</Text>
+          <Text style={styles.subtitle}>
+            {loginMode === 'police' 
+              ? 'Law Enforcement & Emergency Patrol Portal'
+              : 'Your safety, always within reach.'}
+          </Text>
         </View>
 
-        {configMissing && (
+        {/* ROLE SELECTION TABS */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tabButton, loginMode === 'user' && styles.tabButtonActive]}
+            onPress={() => { setLoginMode('user'); setErrorMsg(''); }}
+            activeOpacity={0.8}
+          >
+            <ShieldCheck size={16} color={loginMode === 'user' ? '#fff' : colors.textSecondary} />
+            <Text style={[styles.tabButtonText, loginMode === 'user' && styles.tabButtonTextActive]}>
+              User Login
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabButton, loginMode === 'police' && styles.tabButtonPoliceActive]}
+            onPress={() => { setLoginMode('police'); setErrorMsg(''); }}
+            activeOpacity={0.8}
+          >
+            <Shield size={16} color={loginMode === 'police' ? '#fff' : colors.textSecondary} />
+            <Text style={[styles.tabButtonText, loginMode === 'police' && styles.tabButtonTextActive]}>
+              Police Officer Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {configMissing && loginMode === 'user' && (
           <View style={styles.configWarning}>
             <AlertTriangle size={20} color={colors.accentWarning} />
             <View style={styles.configWarningTextContainer}>
               <Text style={styles.configWarningTitle}>Missing Configuration</Text>
               <Text style={styles.configWarningText}>
-                Firebase Auth is not configured. Add credentials to environment variables to enable authentication.
+                Firebase Auth is not configured. Add credentials to enable user authentication.
               </Text>
             </View>
           </View>
         )}
 
-        <View style={styles.formCard}>
+        <View style={[styles.formCard, loginMode === 'police' && styles.formCardPolice]}>
           {errorMsg ? (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{errorMsg}</Text>
             </View>
           ) : null}
 
-          <View style={styles.form}>
-            <Input 
-              label="Email"
-              placeholder="name@example.com"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              editable={!configMissing}
-              leadingIcon={<Mail size={18} color={colors.textSecondary} />}
-            />
-            
-            <Input 
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              editable={!configMissing}
-              leadingIcon={<Lock size={18} color={colors.textSecondary} />}
-            />
+          {loginMode === 'user' ? (
+            /* ================= USER LOGIN FORM ================= */
+            <View style={styles.form}>
+              <Input 
+                label="Email"
+                placeholder="name@example.com"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                editable={!configMissing}
+                leadingIcon={<Mail size={18} color={colors.textSecondary} />}
+              />
+              
+              <Input 
+                label="Password"
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                editable={!configMissing}
+                leadingIcon={<Lock size={18} color={colors.textSecondary} />}
+              />
 
-            <TouchableOpacity 
-              style={styles.forgotPassword} 
-              activeOpacity={0.7}
-              onPress={() => navigation.navigate('ForgotPassword')}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.forgotPassword} 
+                onPress={() => navigation.navigate('ForgotPassword')}
+                disabled={configMissing}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
 
-            <Button 
-              title="Sign in"
-              onPress={handleLogin} 
-              style={styles.loginButton}
-              disabled={configMissing}
-              loading={isSubmitting}
-            />
-            
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <Button 
-              title="Sign in with Google"
-              variant="secondary"
-              style={styles.googleButton}
-              disabled={configMissing || isSubmitting}
-              onPress={handleGoogleLogin}
-              textStyle={{ fontWeight: '500', color: colors.textPrimary }}
-            />
-
-            <View style={styles.createAccountSection}>
               <Button 
-                title="Create Account"
-                variant="outline"
-                onPress={() => navigation.navigate('Register')}
+                title="Sign In" 
+                onPress={handleUserLogin} 
+                loading={isSubmitting}
+                disabled={configMissing || isSubmitting}
+                style={styles.loginButton}
+                size="large"
+              />
+
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or continue with</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <Button 
+                title="Sign In with Google" 
+                variant="secondary"
+                onPress={handleGoogleLogin} 
+                disabled={configMissing || isSubmitting}
+                style={styles.googleButton}
+                size="large"
+                leadingIcon={<Image source={{ uri: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg' }} style={{ width: 18, height: 18 }} />}
+              />
+
+              <View style={styles.createAccountSection}>
+                <Button 
+                  title="Don't have an account? Sign Up" 
+                  variant="ghost" 
+                  onPress={() => navigation.navigate('Register')}
+                  disabled={configMissing}
+                />
+              </View>
+            </View>
+          ) : (
+            /* ================= POLICE OFFICER LOGIN FORM ================= */
+            <View style={styles.form}>
+              <View style={styles.policeNoticeBanner}>
+                <Shield size={18} color="#3B82F6" style={{ marginTop: 2 }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.policeNoticeTitle}>Authorized Police Personnel Only</Text>
+                  <Text style={styles.policeNoticeText}>
+                    Accounts are strictly provisioned by department administration. Self-registration is disabled.
+                  </Text>
+                </View>
+              </View>
+
+              <Input 
+                label="Badge / Officer ID"
+                placeholder="e.g. POL-101 or POL-102"
+                value={badgeNumber}
+                onChangeText={setBadgeNumber}
+                autoCapitalize="characters"
+                leadingIcon={<BadgeCheck size={18} color="#3B82F6" />}
+              />
+              
+              <Input 
+                label="Password"
+                placeholder="Enter police account password"
+                value={policePassword}
+                onChangeText={setPolicePassword}
+                secureTextEntry
+                leadingIcon={<Lock size={18} color="#3B82F6" />}
+              />
+
+              <View style={styles.officerHelpBox}>
+                <Text style={styles.officerHelpText}>
+                  Authorized test credentials:{'\n'}
+                  • Supervisor: POL-101 / PoliceSecure@2026{'\n'}
+                  • Patrol Officer: POL-102 / PoliceSecure@2026
+                </Text>
+              </View>
+
+              <Button 
+                title="Sign In as Police Officer" 
+                onPress={handlePoliceLogin} 
+                loading={isSubmitting}
                 disabled={isSubmitting}
+                style={styles.policeLoginButton}
+                size="large"
               />
             </View>
-          </View>
+          )}
+
         </View>
+
       </View>
     </ScreenWrapper>
   );
 }
 
-const getStyles = (colors, shadows, isDark) => StyleSheet.create({
+const getStyles = (colors, shadows, isDark, loginMode) => StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: spacing.lg,
@@ -158,7 +271,7 @@ const getStyles = (colors, shadows, isDark) => StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   brandContainer: {
     flexDirection: 'row',
@@ -178,6 +291,10 @@ const getStyles = (colors, shadows, isDark) => StyleSheet.create({
     ...shadows.glowBrand,
     overflow: 'hidden',
   },
+  iconContainerPolice: {
+    backgroundColor: '#0F1E36',
+    borderColor: '#3B82F6',
+  },
   logoImage: {
     width: '100%',
     height: '100%',
@@ -193,6 +310,39 @@ const getStyles = (colors, shadows, isDark) => StyleSheet.create({
     ...typography.subhead,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: isDark ? '#161E2E' : '#E2E8F0',
+    borderRadius: borderRadius.lg,
+    padding: 4,
+    marginBottom: spacing.lg,
+    gap: 4,
+  },
+  tabButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: borderRadius.md,
+    gap: 6,
+  },
+  tabButtonActive: {
+    backgroundColor: colors.accentBrand,
+    ...shadows.subtle,
+  },
+  tabButtonPoliceActive: {
+    backgroundColor: '#1E3A8A',
+    ...shadows.subtle,
+  },
+  tabButtonText: {
+    ...typography.footnote,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  tabButtonTextActive: {
+    color: '#FFFFFF',
   },
   configWarning: {
     flexDirection: 'row',
@@ -226,6 +376,10 @@ const getStyles = (colors, shadows, isDark) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.subtle,
+  },
+  formCardPolice: {
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+    backgroundColor: isDark ? '#0D1525' : '#F8FAFC',
   },
   errorBox: {
     backgroundColor: colors.accentEmergencyMuted,
@@ -279,5 +433,44 @@ const getStyles = (colors, shadows, isDark) => StyleSheet.create({
   createAccountSection: {
     marginTop: spacing.md,
   },
+  policeNoticeBanner: {
+    flexDirection: 'row',
+    backgroundColor: isDark ? 'rgba(30, 58, 138, 0.25)' : 'rgba(219, 234, 254, 0.6)',
+    borderWidth: 1,
+    borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'rgba(147, 197, 253, 0.6)',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  policeNoticeTitle: {
+    ...typography.footnote,
+    fontWeight: '700',
+    color: '#3B82F6',
+    marginBottom: 2,
+  },
+  policeNoticeText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    lineHeight: 16,
+  },
+  officerHelpBox: {
+    backgroundColor: isDark ? '#111A2E' : '#EFF6FF',
+    padding: spacing.sm,
+    borderRadius: borderRadius.sm,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: isDark ? '#1E293B' : '#DBEAFE',
+  },
+  officerHelpText: {
+    fontSize: 11,
+    color: isDark ? '#94A3B8' : '#475569',
+    lineHeight: 16,
+  },
+  policeLoginButton: {
+    backgroundColor: '#1E3A8A',
+    borderColor: '#3B82F6',
+    borderWidth: 1,
+    marginBottom: spacing.sm,
+  },
 });
-

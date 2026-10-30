@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import users, contacts, incidents, locations, admin, admin_auth
+from api import users, contacts, incidents, locations, admin, admin_auth, police, crime, community
 from dotenv import load_dotenv
 import os
 from database.database import engine
@@ -24,6 +24,18 @@ def ensure_schema_compatibility():
                     conn.execute(text("ALTER TABLE incidents ADD COLUMN trigger_source VARCHAR DEFAULT 'MANUAL';"))
                 if "idempotency_key" not in columns:
                     conn.execute(text("ALTER TABLE incidents ADD COLUMN idempotency_key VARCHAR;"))
+                if "locality" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN locality VARCHAR;"))
+                if "city" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN city VARCHAR DEFAULT 'Bengaluru';"))
+                if "is_verified" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN is_verified BOOLEAN DEFAULT 1;"))
+                if "category" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN category VARCHAR DEFAULT 'SOS Emergency';"))
+                if "assigned_officer_id" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN assigned_officer_id INTEGER;"))
+                if "dispatch_status" not in columns:
+                    conn.execute(text("ALTER TABLE incidents ADD COLUMN dispatch_status VARCHAR DEFAULT 'UNASSIGNED';"))
                 conn.commit()
     except Exception as e:
         print(f"Non-critical schema check note: {e}")
@@ -57,6 +69,9 @@ app.include_router(incidents.router)
 app.include_router(locations.router)
 app.include_router(admin.router)
 app.include_router(admin_auth.router)
+app.include_router(police.router)
+app.include_router(crime.router)
+app.include_router(community.router)
 
 @app.get("/")
 def read_root():

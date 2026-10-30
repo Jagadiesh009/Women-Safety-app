@@ -53,3 +53,78 @@ class BulkResolveIncidentsResponse(BaseModel):
     unresolved_remaining: int
     timestamp: datetime
 
+class AdminOfficerCreate(BaseModel):
+    badge_number: str
+    name: str
+    email: str
+    password: str
+    phone: Optional[str] = None
+    rank: Optional[str] = "Patrol Officer"
+    role: Optional[str] = "OFFICER"
+    station_name: Optional[str] = "Central Police Station"
+    assigned_zone: Optional[str] = "Indiranagar"
+
+class AdminOfficerUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    rank: Optional[str] = None
+    role: Optional[str] = None
+    station_name: Optional[str] = None
+    assigned_zone: Optional[str] = None
+
+class AdminOfficerStatusToggle(BaseModel):
+    is_active: bool
+
+class AdminOfficerItem(BaseModel):
+    id: int
+    badge_number: str
+    email: str
+    name: str
+    phone: Optional[str] = None
+    rank: str
+    role: str
+    station_name: str
+    assigned_zone: str
+    is_active: bool
+    is_on_duty: bool = False
+    duty_zone: Optional[str] = None
+    vehicle_number: Optional[str] = None
+    last_location_lat: Optional[float] = None
+    last_location_lng: Optional[float] = None
+    last_location_time: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class AdminAdvisoryCreate(BaseModel):
+    locality: str
+    title: str
+    advisory: str
+    precautions: Optional[str] = None
+    severity: Optional[str] = "WARNING"
+    issuing_authority: Optional[str] = "Bengaluru City Police"
+    expires_days: Optional[int] = 7
+
+class AdminReportVerify(BaseModel):
+    is_verified: bool
+
+class LocalityCrimeRanking(BaseModel):
+    locality: str
+    count: int
+    risk_level: str
+
+class AdminComprehensiveStats(BaseModel):
+    total_users: int
+    total_officers: int
+    on_duty_officers: int
+    pending_incidents: int
+    active_responses: int
+    resolved_incidents: int
+    patrol_units_available: int
+    total_crime_reports: int
+    verified_crime_reports: int
+    active_safety_alerts: int
+    weekly_crime_count: int
+    locality_crime_rankings: List[LocalityCrimeRanking] = []
+    registration_trends: List[RegistrationTrend] = []

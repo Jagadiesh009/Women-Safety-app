@@ -23,6 +23,10 @@ web-build/
 *.jks
 *.keystore
 *.apk
+.gradle/
+build/
+**/android/build/
+**/android/.gradle/
 google-services.json
 !frontend/mobile/google-services.json
 

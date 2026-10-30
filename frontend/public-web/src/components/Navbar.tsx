@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, 
+  ShieldAlert,
   Sun, 
   Moon, 
   Menu, 
@@ -12,10 +13,14 @@ import {
   MapPin, 
   LogIn,
   Smartphone,
-  Users
+  Users,
+  Radio,
+  Lock
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { usePoliceAuth } from '../context/PoliceAuthContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import { APP_CONFIG } from '../config/appConfig';
 import type { PageView } from '../types';
 
@@ -32,13 +37,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { toggleTheme, isDark } = useTheme();
   const { user, isGuest, signOut } = useAuth();
+  const { officer, logoutPolice } = usePoliceAuth();
+  const { adminUser, isAdminAuthenticated, logoutAdmin } = useAdminAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-  // Essential Primary Destinations: Dashboard & Map
+  // Primary Destinations
   const primaryLinks: { label: string; view: PageView; icon: React.ReactNode }[] = [
     { label: 'Dashboard', view: 'dashboard', icon: <LayoutDashboard size={14} /> },
     { label: 'Map', view: 'map', icon: <MapPin size={14} /> },
+    { label: 'Crime Radar', view: 'crime-map', icon: <Radio size={14} /> },
+    { label: 'Safety Map', view: 'community-safety', icon: <ShieldCheck size={14} /> },
   ];
 
   const handleLinkClick = (view: PageView) => {
@@ -52,6 +61,20 @@ export const Navbar: React.FC<NavbarProps> = ({
     setUserDropdownOpen(false);
     setMobileMenuOpen(false);
     await signOut();
+    onNavigate('welcome');
+  };
+
+  const handlePoliceLogout = () => {
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+    logoutPolice();
+    onNavigate('welcome');
+  };
+
+  const handleAdminLogout = () => {
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+    logoutAdmin();
     onNavigate('welcome');
   };
 
@@ -81,8 +104,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">SafeHer</span>
             </button>
 
-            {/* Desktop Navigation Links: Dashboard & Map */}
-            <nav className="hidden sm:flex items-center gap-1" aria-label="Main Navigation">
+            {/* Desktop Navigation Links */}
+            <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
               {primaryLinks.map((link) => (
                 <button 
                   key={link.view} 
@@ -114,15 +137,73 @@ export const Navbar: React.FC<NavbarProps> = ({
             </nav>
           </div>
 
-          {/* Right Action Bar: Theme, APK Download, Auth */}
+          {/* Right Action Bar: Police Portal, Theme, APK Download, Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
             
+            {/* ADMINISTRATOR CONSOLE SHORTCUT (IF LOGGED IN) */}
+            {adminUser && isAdminAuthenticated && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleLinkClick('admin-dashboard')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-950 border border-indigo-500/40 text-indigo-300 text-xs font-bold hover:bg-indigo-900 transition-colors shadow-xs cursor-pointer"
+                  title={`Admin Command Console - ${adminUser.admin_id}`}
+                >
+                  <Lock size={13} className="text-indigo-400" />
+                  <span>Admin ({adminUser.admin_id})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAdminLogout}
+                  className="p-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                  title="Sign out of admin portal"
+                  aria-label="Admin sign out"
+                >
+                  <LogOut size={13} />
+                </button>
+              </div>
+            )}
+
+            {/* POLICE OFFICER CONSOLE SHORTCUT (IF LOGGED IN) */}
+            {officer ? (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => handleLinkClick('police-dashboard')}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-amber-500/40 text-amber-400 text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+                  title={`Police Console - ${officer.rank} ${officer.name}`}
+                >
+                  <ShieldAlert size={13} className="text-amber-400" />
+                  <span>Police ({officer.badge_number})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePoliceLogout}
+                  className="p-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                  title="Sign out of police portal"
+                  aria-label="Officer sign out"
+                >
+                  <LogOut size={13} />
+                </button>
+              </div>
+            ) : !isAdminAuthenticated && (
+              <button
+                onClick={() => {
+                  window.location.hash = 'welcome';
+                  onNavigate('welcome');
+                }}
+                className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-amber-500 border border-[var(--border-subtle)] transition-colors cursor-pointer"
+                title="Law enforcement access"
+              >
+                <ShieldAlert size={12} className="text-amber-500" />
+                <span>Police / Admin</span>
+              </button>
+            )}
+
             {/* Android APK Download Action */}
             <a
               href={APP_CONFIG.apkDownloadUrl}
               download={APP_CONFIG.apkFilename}
               className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] hover:border-[var(--brand-primary)] text-[var(--text-primary)] text-xs font-medium transition-colors shrink-0 cursor-pointer"
-              title="Download SafeHer Android APK (84.6 MB)"
+              title={`Download SafeHer Android APK (${APP_CONFIG.apkSize})`}
             >
               <Smartphone size={13} className="text-[var(--brand-primary)]" />
               <span>Android APK</span>
@@ -225,7 +306,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="sm:hidden p-1.5 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] cursor-pointer"
+              className="md:hidden p-1.5 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={15} /> : <Menu size={15} />}
@@ -236,7 +317,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-[var(--border-subtle)] py-2.5 space-y-1 bg-[var(--bg-base)] animate-fade-in">
+          <div className="md:hidden border-t border-[var(--border-subtle)] py-2.5 space-y-1 bg-[var(--bg-base)] animate-fade-in">
             {primaryLinks.map((link) => (
               <button
                 key={link.view}
@@ -251,6 +332,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{link.label}</span>
               </button>
             ))}
+
+            {adminUser && isAdminAuthenticated && (
+              <button
+                onClick={() => handleLinkClick('admin-dashboard')}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-indigo-300 bg-indigo-950 border border-indigo-500/40 transition-colors cursor-pointer"
+              >
+                <Lock size={14} />
+                <span>Admin Command Center ({adminUser.admin_id})</span>
+              </button>
+            )}
+
+            {officer && (
+              <button
+                onClick={() => handleLinkClick('police-dashboard')}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-xs font-bold text-amber-500 bg-slate-900 border border-amber-500/30 transition-colors cursor-pointer"
+              >
+                <ShieldAlert size={14} />
+                <span>Police Dispatch Console ({officer.badge_number})</span>
+              </button>
+            )}
 
             {user && (
               <button
