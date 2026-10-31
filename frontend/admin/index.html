@@ -2384,9 +2384,9 @@
             } else {
                 const adminToken = localStorage.getItem('adminToken');
                 const policeToken = localStorage.getItem('policeToken');
-                const savedRole = localStorage.getItem('safeher_role');
+                const savedRole = (localStorage.getItem('safeher_role') || 'OFFICER').toUpperCase();
 
-                if (policeToken && (savedRole === 'SUPERVISOR' || savedRole === 'OFFICER')) {
+                if (policeToken && savedRole !== 'ADMIN') {
                     loadDashboard(policeToken, savedRole);
                 } else if (adminToken) {
                     loadDashboard(adminToken, 'ADMIN');
@@ -2749,9 +2749,14 @@
                 document.getElementById('tab-users')?.classList.add('hidden');
 
                 try {
-                    const profRes = await fetch(`${API_URL}/police/officer/me`, {
+                    let profRes = await fetch(`${API_URL}/police/auth/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
+                    if (!profRes.ok && profRes.status === 404) {
+                        profRes = await fetch(`${API_URL}/police/officer/me`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    }
                     if (profRes.ok) {
                         policeOfficer = await profRes.json();
                         const prefix = role === 'SUPERVISOR' ? '🎖️ Supervisor' : '👮 Officer';
@@ -2767,8 +2772,11 @@
                     });
                     if (dutyRes.ok) {
                         const dutyData = await dutyRes.json();
+                        if (policeOfficer) {
+                            policeOfficer.is_on_duty = dutyData.is_on_duty;
+                            if (dutyData.current_patrol_zone) policeOfficer.assigned_zone = dutyData.current_patrol_zone;
+                        }
                         updateDutyDisplay(dutyData.is_on_duty, dutyData.current_patrol_zone);
-                        if (policeOfficer) policeOfficer.is_on_duty = dutyData.is_on_duty;
                     }
                 } catch (e) {
                     console.warn("Police profile fetch notice:", e);
@@ -2803,14 +2811,41 @@
                     btn.innerText = '⚡ Go ON Duty';
                 }
             }
+            // Remove beacon and radar coverage circle from map when OFF DUTY
+            if (!isOnDuty && radarMap) {
+                if (officerMarker) {
+                    radarMap.removeLayer(officerMarker);
+                    officerMarker = null;
+                }
+                if (radarCircle) {
+                    radarMap.removeLayer(radarCircle);
+                    radarCircle = null;
+                }
+            }
         }
 
         async function toggleDuty() {
             const token = localStorage.getItem('policeToken');
             if (!token) return;
-            const currentDuty = policeOfficer ? policeOfficer.is_on_duty : false;
+
+            // Robust duty state check: prioritize policeOfficer object, fallback to DOM button/badge state
+            let currentDuty = false;
+            if (policeOfficer && typeof policeOfficer.is_on_duty === 'boolean') {
+                currentDuty = policeOfficer.is_on_duty;
+            } else {
+                const badge = document.getElementById('headerDutyBadge');
+                const btn = document.getElementById('headerDutyToggleBtn');
+                if (badge && badge.classList.contains('on-duty')) {
+                    currentDuty = true;
+                } else if (btn && (btn.classList.contains('toggle-off') || btn.innerText.includes('OFF Duty'))) {
+                    currentDuty = true;
+                }
+            }
             const newDuty = !currentDuty;
             const targetZone = (policeOfficer && (policeOfficer.station_name || policeOfficer.assigned_zone)) || 'Station not assigned';
+
+            const btn = document.getElementById('headerDutyToggleBtn');
+            if (btn) btn.disabled = true;
 
             try {
                 const res = await fetch(`${API_URL}/police/duty/toggle`, {
@@ -2823,15 +2858,39 @@
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    if (policeOfficer) policeOfficer.is_on_duty = data.is_on_duty;
+                    if (!policeOfficer) policeOfficer = {};
+                    policeOfficer.is_on_duty = data.is_on_duty;
                     updateDutyDisplay(data.is_on_duty, data.current_patrol_zone);
+
+                    if (!data.is_on_duty) {
+                        // Immediately wipe out beacon marker and coverage radius when off duty
+                        if (officerMarker && radarMap) {
+                            radarMap.removeLayer(officerMarker);
+                            officerMarker = null;
+                        }
+                        if (radarCircle && radarMap) {
+                            radarMap.removeLayer(radarCircle);
+                            radarCircle = null;
+                        }
+                    } else {
+                        // Went ON duty: refresh GPS and display self beacon marker
+                        if (officerLat && officerLng) {
+                            updateOfficerRadarMarker();
+                        } else {
+                            requestOfficerGeolocation();
+                        }
+                    }
+
                     showToast(data.is_on_duty ? "Status updated: ON DUTY" : "Status updated: OFF DUTY", "info");
                     fetchRadarData();
                 } else {
-                    throw new Error("Failed to toggle duty status");
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.detail || "Failed to toggle duty status");
                 }
             } catch (e) {
                 showToast(e.message, "emergency");
+            } finally {
+                if (btn) btn.disabled = false;
             }
         }
 
@@ -2916,12 +2975,16 @@
 
                     if (radarMap) {
                         radarMap.setView([officerLat, officerLng], 14);
-                        updateOfficerRadarMarker();
+                        const isOnDuty = policeOfficer ? policeOfficer.is_on_duty : document.getElementById('headerDutyBadge')?.classList.contains('on-duty');
+                        if (authRole !== 'ADMIN' && isOnDuty) {
+                            updateOfficerRadarMarker();
+                        }
                     }
 
-                    // Transmit live GPS coordinates to backend
+                    // Transmit live GPS coordinates to backend ONLY when ON DUTY
                     const token = localStorage.getItem('policeToken');
-                    if (token) {
+                    const isOnDuty = policeOfficer ? policeOfficer.is_on_duty : document.getElementById('headerDutyBadge')?.classList.contains('on-duty');
+                    if (token && authRole !== 'ADMIN' && isOnDuty) {
                         try {
                             await fetch(`${API_URL}/police/patrol/location`, {
                                 method: 'POST',
@@ -2954,11 +3017,23 @@
         }
 
         function updateOfficerRadarMarker() {
-            if (!radarMap || !officerLat || !officerLng) return;
+            if (!radarMap) return;
 
             // Remove existing officer marker and circle
-            if (officerMarker) radarMap.removeLayer(officerMarker);
-            if (radarCircle) radarMap.removeLayer(radarCircle);
+            if (officerMarker) {
+                radarMap.removeLayer(officerMarker);
+                officerMarker = null;
+            }
+            if (radarCircle) {
+                radarMap.removeLayer(radarCircle);
+                radarCircle = null;
+            }
+
+            // Only render self beacon marker and radius if officer is logged in and ON DUTY
+            const isOnDuty = policeOfficer ? policeOfficer.is_on_duty : document.getElementById('headerDutyBadge')?.classList.contains('on-duty');
+            if (authRole === 'ADMIN' || !isOnDuty || !officerLat || !officerLng) {
+                return;
+            }
 
             // Translucent coverage radius circle
             radarCircle = L.circle([officerLat, officerLng], {
@@ -2971,12 +3046,13 @@
             }).addTo(radarMap);
 
             // Officer Beacon Marker (Distinct Blue)
+            const officerBadgeText = (policeOfficer && policeOfficer.badge_number) || 'Officer';
             const officerIcon = L.divIcon({
                 className: 'custom-officer-beacon',
                 html: `
                     <div style="display: flex; flex-direction: column; align-items: center; pointer-events: auto;">
                         <div style="background: #1D4ED8; color: #FFFFFF; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid #FFFFFF;">
-                            You (${(policeOfficer && policeOfficer.badge_number) || 'Officer'})
+                            You (${officerBadgeText})
                         </div>
                         <div style="width: 14px; height: 14px; background: #2563EB; border: 2.5px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 8px #2563EB; margin-top: 2px;"></div>
                     </div>
@@ -2991,7 +3067,7 @@
                     <strong>Your Patrol Beacon</strong><br>
                     Badge: <b>${(policeOfficer && policeOfficer.badge_number) || 'N/A'}</b><br>
                     Officer: ${(policeOfficer && policeOfficer.name) || 'Patrol Unit'}<br>
-                    Zone: ${(policeOfficer && policeOfficer.assigned_zone) || 'General'}<br>
+                    Zone: ${(policeOfficer && (policeOfficer.station_name || policeOfficer.assigned_zone)) || 'General'}<br>
                     Coverage Radius: <b>${radarRadiusKm} km</b>
                 </div>
             `);
@@ -3044,8 +3120,31 @@
             otherUnitMarkers.forEach(m => { if (radarMap) radarMap.removeLayer(m); });
             otherUnitMarkers = [];
 
-            // Filter out self so we don't display duplicate pins
-            const otherUnits = units.filter(u => !u.is_self && u.latitude && u.longitude);
+            const myBadge = policeOfficer ? policeOfficer.badge_number : null;
+            const myId = policeOfficer ? policeOfficer.id : null;
+            const myName = policeOfficer ? policeOfficer.name : null;
+
+            // Filter out self so we NEVER display duplicate or false pins for the logged-in officer
+            const otherUnits = (units || []).filter(u => {
+                if (!u.latitude || !u.longitude) return false;
+                // 1. Explicit backend is_self flag
+                if (u.is_self) return false;
+                // 2. Badge match
+                if (myBadge && u.badge_number && u.badge_number.trim().toUpperCase() === myBadge.trim().toUpperCase()) return false;
+                // 3. Officer ID match
+                if (myId && u.officer_id === myId) return false;
+                // 4. Officer Name match
+                if (myName && u.name && u.name.trim().toLowerCase() === myName.trim().toLowerCase()) return false;
+                // 5. GPS proximity match with current officer position (< 20 meters / 0.0002 deg)
+                if (officerLat && officerLng) {
+                    const dLat = Math.abs(u.latitude - officerLat);
+                    const dLng = Math.abs(u.longitude - officerLng);
+                    if (dLat < 0.0002 && dLng < 0.0002) {
+                        return false;
+                    }
+                }
+                return true;
+            });
             const countBadge = document.getElementById('radarUnitsCountBadge');
             if (countBadge) countBadge.innerText = otherUnits.length;
 

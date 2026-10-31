@@ -195,6 +195,7 @@ def police_login(payload: PoliceLoginRequest, db: Session = Depends(get_db)):
     )
 
 @router.get("/auth/me", response_model=PoliceOfficerResponse)
+@router.get("/officer/me", response_model=PoliceOfficerResponse)
 def get_police_me(
     officer: PoliceOfficer = Depends(get_current_police_officer),
     db: Session = Depends(get_db)
