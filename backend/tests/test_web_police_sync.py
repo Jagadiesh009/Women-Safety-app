@@ -326,3 +326,130 @@ def test_06_crime_analytics_and_community_endpoints():
     assert comm_resp.status_code == 200
     c_data = comm_resp.json()
     assert any(loc["risk_color"] in ("RED", "ORANGE", "GREEN") for loc in c_data)
+
+def test_07_nearby_police_radar_e2e():
+    """Verify civilian nearby police radar discovery, radius filtering, duty status, and privacy."""
+    # 1. Login as Officer POL-102
+    login_resp = client.post("/police/auth/login", json={
+        "badge_number": "POL-102",
+        "password": "PoliceSecure@2026"
+    })
+    assert login_resp.status_code == 200
+    officer_token = login_resp.json()["access_token"]
+    officer_headers = {"Authorization": f"Bearer {officer_token}"}
+
+    # Set ON DUTY with assigned station
+    duty_resp = client.post("/police/duty/toggle", headers=officer_headers, json={
+        "is_on_duty": True,
+        "patrol_zone": "Indiranagar Police Station",
+        "vehicle_number": "KA-01-G-102"
+    })
+    assert duty_resp.status_code == 200
+
+    # Publish current patrol coordinates in Indiranagar (12.9784, 77.6408)
+    loc_resp = client.post("/police/patrol/location", headers=officer_headers, json={
+        "latitude": 12.9784,
+        "longitude": 77.6408,
+        "accuracy": 10.0,
+        "speed": 15.0,
+        "heading": 90.0
+    })
+    assert loc_resp.status_code == 200
+
+    # Civilian coordinates nearby in Indiranagar (12.9716, 77.6412) ~ 0.75 km away
+    civilian_headers = {"Authorization": "Bearer test-token-civilian-radar-test"}
+
+    # Query with 3 km radius
+    radar_resp = client.get(
+        "/police/nearby?latitude=12.9716&longitude=77.6412&radius_km=3.0",
+        headers=civilian_headers
+    )
+    assert radar_resp.status_code == 200, radar_resp.text
+    units = radar_resp.json()
+    assert len(units) >= 1
+    found = next((u for u in units if u["badge_number"] == "POL-102"), None)
+    assert found is not None
+    assert found["duty_status"] == "ON DUTY"
+    assert found["distance_km"] < 3.0
+    assert "station_name" in found
+    assert "password" not in found
+    assert "phone" not in found  # Privacy check: personal contact info excluded
+
+    # Query from far away (Delhi: 28.6139, 77.2090) -> Should return empty
+    far_resp = client.get(
+        "/police/nearby?latitude=28.6139&longitude=77.2090&radius_km=3.0",
+        headers=civilian_headers
+    )
+    assert far_resp.status_code == 200
+    assert len(far_resp.json()) == 0
+
+    # Toggle OFF DUTY
+    off_duty_resp = client.post("/police/duty/toggle", headers=officer_headers, json={
+        "is_on_duty": False
+    })
+    assert off_duty_resp.status_code == 200
+
+    # Civilian re-queries -> Officer must immediately disappear
+    radar_after_off = client.get(
+        "/police/nearby?latitude=12.9716&longitude=77.6412&radius_km=3.0",
+        headers=civilian_headers
+    )
+    assert radar_after_off.status_code == 200
+    assert not any(u["badge_number"] == "POL-102" for u in radar_after_off.json())
+
+    # Validation: missing token returns 401
+    unauth = client.get("/police/nearby?latitude=12.9716&longitude=77.6412&radius_km=3.0")
+    assert unauth.status_code == 401
+
+    # Validation: invalid coordinates return 422
+    invalid_coords = client.get(
+        "/police/nearby?latitude=999.0&longitude=77.6412&radius_km=3.0",
+        headers=civilian_headers
+    )
+    assert invalid_coords.status_code == 422
+
+def test_08_admin_and_supervisor_advisories_and_recommendations():
+    """Verify dual RBAC allowing Admin and Police Supervisor to access advisories & recommendations, while blocking regular officers."""
+    # 1. Police Supervisor login (POL-101)
+    sup_login = client.post("/police/auth/login", json={
+        "badge_number": "POL-101",
+        "password": "PoliceSecure@2026"
+    })
+    assert sup_login.status_code == 200
+    sup_token = sup_login.json()["access_token"]
+    sup_headers = {"Authorization": f"Bearer {sup_token}"}
+
+    # Supervisor loads advisories -> Must NOT be 401
+    adv_resp = client.get("/admin/advisories", headers=sup_headers)
+    assert adv_resp.status_code == 200, f"Supervisor got {adv_resp.status_code}: {adv_resp.text}"
+
+    # Supervisor loads patrol recommendations -> Must NOT be 401
+    rec_resp = client.get("/admin/patrol-recommendations", headers=sup_headers)
+    assert rec_resp.status_code == 200, f"Supervisor got {rec_resp.status_code}: {rec_resp.text}"
+
+    # Supervisor broadcasts a safety advisory
+    pub_resp = client.post("/admin/advisories", headers=sup_headers, json={
+        "locality": "Koramangala",
+        "severity": "WARNING",
+        "title": "Night Patrol Advisory",
+        "advisory": "Enhanced police patrolling deployed along 80 Feet Road.",
+        "expires_days": 5
+    })
+    assert pub_resp.status_code == 201
+
+    # 2. Regular Patrol Officer login (POL-102)
+    off_login = client.post("/police/auth/login", json={
+        "badge_number": "POL-102",
+        "password": "PoliceSecure@2026"
+    })
+    assert off_login.status_code == 200
+    off_token = off_login.json()["access_token"]
+    off_headers = {"Authorization": f"Bearer {off_token}"}
+
+    # Regular officer must be denied (403 Forbidden)
+    off_adv = client.get("/admin/advisories", headers=off_headers)
+    assert off_adv.status_code == 403
+
+    # 3. Missing or invalid token must return 401
+    no_token_adv = client.get("/admin/advisories")
+    assert no_token_adv.status_code == 401

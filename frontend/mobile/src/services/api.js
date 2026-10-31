@@ -21,6 +21,28 @@ console.log('[API Config] Initial base URL:', activeBaseUrl);
 
 // Helper to get fresh token and configure headers for either user or police officer
 const getHeaders = async (endpoint = '') => {
+    // 0. Nearby police radar endpoint (accessible to civilians, police, and test fixtures)
+    if (endpoint.startsWith('/police/nearby')) {
+        const user = auth.currentUser;
+        if (user) {
+            try {
+                const token = await user.getIdToken();
+                return {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+            } catch (e) {}
+        }
+        const policeToken = await AsyncStorage.getItem('@safeher_police_token');
+        if (policeToken) {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${policeToken}`
+            };
+        }
+        return { 'Content-Type': 'application/json' };
+    }
+
     // 1. Police endpoints
     if (endpoint.startsWith('/police')) {
         if (endpoint === '/police/auth/login') {
@@ -307,4 +329,6 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(alertData)
     }),
+    getNearbyPolice: (latitude, longitude, radiusKm = 3.0) => 
+        fetchApi(`/police/nearby?latitude=${latitude}&longitude=${longitude}&radius_km=${radiusKm}`),
 };

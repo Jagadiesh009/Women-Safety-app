@@ -7,7 +7,8 @@ import type {
   LocalityCrimeSummaryItem,
   WeeklyCrimeReportData,
   CommunitySafetyLocality,
-  CommunityAlertItem
+  CommunityAlertItem,
+  NearbyPoliceOfficer
 } from '../types';
 
 const getApiBaseUrl = (): string => {
@@ -370,6 +371,26 @@ export const api = {
     }
     return [];
   },
+
+  async getNearbyPolice(latitude: number, longitude: number, radiusKm: number = 3.0): Promise<NearbyPoliceOfficer[]> {
+    const headers = await getAuthHeaders();
+    try {
+      const res = await fetch(`${API_BASE_URL}/police/nearby?latitude=${latitude}&longitude=${longitude}&radius_km=${radiusKm}`, {
+        headers
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.warn('[SafeHer API] Nearby police radar unauthorized');
+          return [];
+        }
+        throw new Error(`Failed to fetch nearby police (${res.status})`);
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn('[SafeHer API] Nearby police fetch error:', e);
+      return [];
+    }
+  },
 };
 
 // ============================================================================
@@ -429,6 +450,26 @@ export const crimeApi = {
 
   getWeeklyReportPdfUrl(weeksAgo = 0): string {
     return `${API_BASE_URL}/crime/weekly-report/pdf?weeks_ago=${weeksAgo}`;
+  },
+
+  async getNearbyPolice(latitude: number, longitude: number, radiusKm: number = 3.0): Promise<NearbyPoliceOfficer[]> {
+    const headers = await getAuthHeaders();
+    try {
+      const res = await fetch(`${API_BASE_URL}/police/nearby?latitude=${latitude}&longitude=${longitude}&radius_km=${radiusKm}`, {
+        headers
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.warn('[SafeHer API] Nearby police radar unauthorized');
+          return [];
+        }
+        throw new Error(`Failed to fetch nearby police (${res.status})`);
+      }
+      return await res.json();
+    } catch (e) {
+      console.warn('[SafeHer API] Nearby police fetch error:', e);
+      return [];
+    }
   }
 };
 

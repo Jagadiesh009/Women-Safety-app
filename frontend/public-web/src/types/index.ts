@@ -205,3 +205,16 @@ export interface CommunityAlertItem {
   created_at: string;
   police_station?: string | null;
 }
+
+export interface NearbyPoliceOfficer {
+  officer_id: number;
+  display_name: string;
+  badge_number: string;
+  rank: string;
+  station_name: string;
+  latitude: number;
+  longitude: number;
+  distance_km: number;
+  duty_status: string;
+  last_location_update: string;
+}

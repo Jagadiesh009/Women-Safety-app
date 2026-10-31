@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { ScreenWrapper } from '../components/ui/ScreenWrapper';
 import { MapPin, Navigation, Shield, Crosshair, AlertTriangle } from 'lucide-react-native';
 import { useAppTheme, spacing, typography, borderRadius } from '../utils/theme';
+import { api } from '../services/api';
 
 export function MapScreen() {
   const { location, errorMsg, isLoading, refreshLocation } = useLocation();
@@ -78,6 +79,28 @@ export function MapScreen() {
       }
 
       let fetchedPlaces = [];
+
+      // Tier 0: Real-Time On-Duty Police Radar from SafeHer Backend
+      if (activeCategory === 'Police' || activeCategory === 'All') {
+        try {
+          const nearbyPolice = await api.getNearbyPolice(lat, lng, 5.0);
+          if (Array.isArray(nearbyPolice) && nearbyPolice.length > 0) {
+            const policePOIs = nearbyPolice.map(p => ({
+              name: `${p.display_name} (Badge: ${p.badge_number})`,
+              distance: p.distance_km,
+              types: ['police'],
+              lat: p.latitude,
+              lng: p.longitude,
+              vicinity: `${p.station_name} • ON DUTY (${p.distance_km} km away)`,
+              isOnDuty: true,
+              badgeNumber: p.badge_number
+            }));
+            fetchedPlaces.push(...policePOIs);
+          }
+        } catch (radarErr) {
+          console.warn('[SafeHer Radar] Mobile nearby police radar fetch note:', radarErr.message);
+        }
+      }
 
       // Tier 1: OpenStreetMap Nominatim amenity search
       try {

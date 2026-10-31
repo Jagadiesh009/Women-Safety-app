@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, or_
 from datetime import datetime, timezone, timedelta
@@ -27,6 +27,7 @@ from schemas.api_schemas import (
     DutyStatusResponse,
     PatrolLocationCreate,
     PatrolUnitMarker,
+    NearbyPoliceOfficerResponse,
     IncomingAlertItem,
     IncidentStatusUpdateRequest,
     PoliceIncidentDetail,
@@ -38,6 +39,7 @@ from api.deps import (
     get_db,
     get_current_police_officer,
     get_current_police_supervisor,
+    get_civilian_or_authorized_user,
     POLICE_JWT_SECRET,
     POLICE_JWT_ALGORITHM
 )
@@ -237,8 +239,9 @@ def toggle_duty_status(
     if payload.is_on_duty:
         duty.duty_started_at = now
         duty.duty_ended_at = None
-        if payload.patrol_zone:
-            duty.current_patrol_zone = payload.patrol_zone
+        assigned_zone_or_station = officer.station_name or officer.assigned_zone or "Station not assigned"
+        duty.current_patrol_zone = payload.patrol_zone or assigned_zone_or_station
+
         if payload.vehicle_number:
             duty.vehicle_number = payload.vehicle_number
     else:
@@ -358,6 +361,82 @@ def get_active_patrol_units(
             ))
             
     return markers
+
+@router.get("/nearby", response_model=List[NearbyPoliceOfficerResponse])
+def get_nearby_officers(
+    latitude: float = Query(..., ge=-90.0, le=90.0, description="Civilian latitude"),
+    longitude: float = Query(..., ge=-180.0, le=180.0, description="Civilian longitude"),
+    radius_km: float = Query(3.0, gt=0.0, le=50.0, description="Search radius in kilometers"),
+    _auth: dict = Depends(get_civilian_or_authorized_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Find authorized police officers who:
+    - Are currently ON DUTY
+    - Have location sharing enabled (active PatrolLocation records)
+    - Have a valid, recent GPS location (non-stale <= 30 mins)
+    - Are within the requested radius (e.g. 1 km, 2 km, 3 km, 5 km)
+    Privacy protections:
+    - Only ON DUTY officers returned
+    - No personal phone, email, or home address exposed
+    - Immediately omits officers when they switch to OFF DUTY
+    - Real authorized coordinates only (zero mock / fabricated entries)
+    """
+    now = datetime.now(timezone.utc)
+    stale_cutoff = now - timedelta(minutes=30)
+
+    # Query active officers who are currently on duty
+    on_duty_officers = (
+        db.query(PoliceOfficer)
+        .join(PoliceDutyStatus, PoliceOfficer.id == PoliceDutyStatus.officer_id)
+        .filter(
+            PoliceOfficer.is_active == True,
+            PoliceDutyStatus.is_on_duty == True
+        )
+        .all()
+    )
+
+    nearby_units = []
+    for officer in on_duty_officers:
+        latest_loc = (
+            db.query(PatrolLocation)
+            .filter(PatrolLocation.officer_id == officer.id)
+            .order_by(PatrolLocation.timestamp.desc())
+            .first()
+        )
+        if not latest_loc:
+            continue
+
+        # Check freshness: exclude locations older than 30 minutes
+        loc_time = latest_loc.timestamp
+        if loc_time.tzinfo is None:
+            loc_time = loc_time.replace(tzinfo=timezone.utc)
+        if loc_time < stale_cutoff:
+            continue
+
+        distance = haversine_km(latitude, longitude, latest_loc.latitude, latest_loc.longitude)
+        if distance <= radius_km:
+            rank_str = officer.rank or "Patrol Officer"
+            display_name = f"{rank_str} {officer.name}".strip()
+            station = officer.station_name or officer.assigned_zone or "Station not assigned"
+            
+            nearby_units.append(
+                NearbyPoliceOfficerResponse(
+                    officer_id=officer.id,
+                    display_name=display_name,
+                    badge_number=officer.badge_number,
+                    rank=rank_str,
+                    station_name=station,
+                    latitude=latest_loc.latitude,
+                    longitude=latest_loc.longitude,
+                    distance_km=round(distance, 2),
+                    duty_status="ON DUTY",
+                    last_location_update=latest_loc.timestamp
+                )
+            )
+
+    nearby_units.sort(key=lambda x: x.distance_km)
+    return nearby_units
 
 # ============================================================================
 # 3. REAL-TIME SOS ALERTS & DISPATCH (ACCEPT / DECLINE)

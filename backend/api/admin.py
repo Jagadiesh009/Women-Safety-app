@@ -22,7 +22,7 @@ from database.models import (
     IncidentResponse,
     DispatchNotification
 )
-from api.deps import get_db
+from api.deps import get_db, verify_admin_or_supervisor
 from schemas.admin_schemas import (
     AdminDashboardResponse,
     RegistrationTrend,
@@ -200,7 +200,7 @@ def get_comprehensive_stats(db: Session = Depends(get_db), admin_user: AdminUser
 # ==========================================
 
 @router.get("/officers", response_model=List[AdminOfficerItem])
-def list_officers(db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
+def list_officers(db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
     """Lists all police officers, their operational duty status, and latest patrol coordinates."""
     officers = db.query(PoliceOfficer).options(
         joinedload(PoliceOfficer.duty_status),
@@ -227,7 +227,7 @@ def list_officers(db: Session = Depends(get_db), admin_user: AdminUser = Depends
             rank=off.rank or "Patrol Officer",
             role=off.role or "OFFICER",
             station_name=off.station_name or "Central Police Station",
-            assigned_zone=off.assigned_zone or "Indiranagar",
+            assigned_zone=off.assigned_zone or off.station_name or "Station not assigned",
             is_active=off.is_active,
             is_on_duty=is_on_duty,
             duty_zone=duty_zone,
@@ -264,7 +264,7 @@ def create_officer(req: AdminOfficerCreate, db: Session = Depends(get_db), admin
         rank=req.rank or "Patrol Officer",
         role=req.role or "OFFICER",
         station_name=req.station_name or "Central Police Station",
-        assigned_zone=req.assigned_zone or "Indiranagar",
+        assigned_zone=req.assigned_zone or req.station_name or "Station not assigned",
         is_active=True
     )
     db.add(new_officer)
@@ -509,15 +509,17 @@ def resolve_incident(incident_id: int, db: Session = Depends(get_db), admin_user
 # ==========================================
 
 @router.get("/advisories")
-def list_advisories(db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
-    """Returns all official community safety advisories with admin controls."""
+def list_advisories(db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
+    """Returns all official community safety advisories with admin and supervisor controls."""
     alerts = db.query(CommunitySafetyAlert).order_by(CommunitySafetyAlert.created_at.desc()).all()
     return alerts
 
 @router.post("/advisories", status_code=status.HTTP_201_CREATED)
-def publish_advisory(req: AdminAdvisoryCreate, db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
+def publish_advisory(req: AdminAdvisoryCreate, db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
     """Publishes an official city-wide or locality safety advisory to the community map."""
     expires_at = datetime.now(timezone.utc) + timedelta(days=req.expires_days or 7)
+    approver_name = auth_user.get("name") or auth_user.get("admin_id") or "Command"
+    issuing_authority = req.issuing_authority or f"SafeHer HQ / Bengaluru Police ({auth_user.get('role', 'Admin')}: {approver_name})"
     
     new_alert = CommunitySafetyAlert(
         locality=req.locality.strip(),
@@ -525,7 +527,8 @@ def publish_advisory(req: AdminAdvisoryCreate, db: Session = Depends(get_db), ad
         advisory=req.advisory.strip(),
         precautions=req.precautions.strip() if req.precautions else None,
         severity=req.severity.upper() if req.severity else "WARNING",
-        issuing_authority=req.issuing_authority or f"SafeHer HQ / Bengaluru Police (Admin: {admin_user.admin_id})",
+        issuing_authority=issuing_authority,
+        issued_by_officer_id=auth_user.get("officer_id") if auth_user.get("role") == "SUPERVISOR" else None,
         expires_at=expires_at,
         is_active=True
     )
@@ -535,7 +538,7 @@ def publish_advisory(req: AdminAdvisoryCreate, db: Session = Depends(get_db), ad
     return new_alert
 
 @router.put("/advisories/{advisory_id}/toggle")
-def toggle_advisory(advisory_id: int, db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
+def toggle_advisory(advisory_id: int, db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
     """Toggles active/inactive visibility of a safety advisory on the public map."""
     alert = db.query(CommunitySafetyAlert).filter(CommunitySafetyAlert.id == advisory_id).first()
     if not alert:
@@ -546,7 +549,7 @@ def toggle_advisory(advisory_id: int, db: Session = Depends(get_db), admin_user:
     return {"id": alert.id, "is_active": alert.is_active, "message": f"Advisory is now {'ACTIVE' if alert.is_active else 'INACTIVE'}."}
 
 @router.delete("/advisories/{advisory_id}")
-def delete_advisory(advisory_id: int, db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
+def delete_advisory(advisory_id: int, db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
     """Deletes an official safety advisory."""
     alert = db.query(CommunitySafetyAlert).filter(CommunitySafetyAlert.id == advisory_id).first()
     if not alert:
@@ -561,7 +564,7 @@ def delete_advisory(advisory_id: int, db: Session = Depends(get_db), admin_user:
 # ==========================================
 
 @router.get("/patrol-recommendations")
-def list_patrol_recommendations(db: Session = Depends(get_db), admin_user: AdminUser = Depends(verify_admin)):
+def list_patrol_recommendations(db: Session = Depends(get_db), auth_user: dict = Depends(verify_admin_or_supervisor)):
     """Returns AI-driven patrol recommendations for supervisor and administrator review."""
     recommendations = db.query(PatrolRecommendation).options(
         joinedload(PatrolRecommendation.assigned_officer)
@@ -575,7 +578,7 @@ def approve_patrol_recommendation(
     officer_id: Optional[int] = Query(None),
     instructions: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    admin_user: AdminUser = Depends(verify_admin)
+    auth_user: dict = Depends(verify_admin_or_supervisor)
 ):
     """Approves an area patrol recommendation and dispatches an assignment."""
     rec = db.query(PatrolRecommendation).filter(PatrolRecommendation.id == rec_id).first()
@@ -588,13 +591,14 @@ def approve_patrol_recommendation(
         if officer:
             rec.assigned_officer_id = officer.id
             rec.status = "DEPLOYED"
+            approver_name = auth_user.get("name") or auth_user.get("admin_id") or "Command"
             # Create a patrol assignment
             assignment = PatrolAssignment(
                 officer_id=officer.id,
                 locality=rec.locality,
                 zone=officer.assigned_zone or rec.locality,
                 shift_period=rec.suggested_patrol_period or "Night Patrol (20:00 - 04:00)",
-                instructions=instructions or f"Approved by Administrator {admin_user.admin_id}: {rec.reason}",
+                instructions=instructions or f"Approved by {auth_user.get('role', 'Supervisor')} {approver_name}: {rec.reason}",
                 status="ASSIGNED"
             )
             db.add(assignment)

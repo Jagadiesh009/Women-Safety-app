@@ -88,7 +88,7 @@ export function PoliceDashboardScreen({ navigation }) {
     try {
       const updatedDuty = await api.toggleDutyStatus(
         value,
-        officer?.assigned_zone || "Indiranagar",
+        officer?.station_name || officer?.assigned_zone || "Station not assigned",
         officer?.vehicle_number || "KA-01-G-102"
       );
       setIsOnDuty(updatedDuty.is_on_duty);
@@ -224,7 +224,7 @@ export function PoliceDashboardScreen({ navigation }) {
                 </Text>
               </View>
               <Text style={styles.dutySectorText}>
-                Assigned Beat: {officer?.assigned_zone || 'Indiranagar Central'}
+                Assigned Station: {officer?.station_name || officer?.assigned_zone || 'Station not assigned'}
               </Text>
               <Text style={styles.dutySubText}>
                 {isOnDuty 
@@ -258,7 +258,7 @@ export function PoliceDashboardScreen({ navigation }) {
                 <ChevronRight size={18} color="#EF4444" />
               </View>
               <Text style={styles.incidentLocality}>
-                Incident #{activeIncident.id} • {activeIncident.locality || 'Indiranagar'}
+                Incident #{activeIncident.id} • {activeIncident.locality || 'Location not specified'}
               </Text>
               <Text style={styles.incidentCategory}>
                 Category: {activeIncident.category} • Status: {activeIncident.dispatch_status}

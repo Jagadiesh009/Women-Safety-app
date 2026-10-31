@@ -2787,7 +2787,8 @@
             if (badge) {
                 if (isOnDuty) {
                     badge.className = 'duty-badge on-duty';
-                    badge.innerText = `● ON DUTY (${zone || 'Indiranagar'})`;
+                    const stationText = zone || (policeOfficer && (policeOfficer.station_name || policeOfficer.assigned_zone)) || 'Station not assigned';
+                    badge.innerText = `● ON DUTY (${stationText})`;
                 } else {
                     badge.className = 'duty-badge off-duty';
                     badge.innerText = 'OFF DUTY';
@@ -2809,7 +2810,7 @@
             if (!token) return;
             const currentDuty = policeOfficer ? policeOfficer.is_on_duty : false;
             const newDuty = !currentDuty;
-            const targetZone = (policeOfficer && policeOfficer.assigned_zone) || 'Indiranagar';
+            const targetZone = (policeOfficer && (policeOfficer.station_name || policeOfficer.assigned_zone)) || 'Station not assigned';
 
             try {
                 const res = await fetch(`${API_URL}/police/duty/toggle`, {
@@ -3712,7 +3713,7 @@
 
         async function executeResolveIncident() {
             if (!pendingResolveIncidentId) return;
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const btn = document.getElementById('confirmResolveBtn');
             const err = document.getElementById('resolveModalError');
             if (btn) { btn.innerText = "Resolving..."; btn.disabled = true; }
@@ -3754,7 +3755,7 @@
         }
 
         async function executeResolveAllIncidents() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const btn = document.getElementById('confirmResolveAllBtn');
             const err = document.getElementById('resolveAllModalError');
             if (btn) { btn.innerText = "Resolving All..."; btn.disabled = true; }
@@ -3789,7 +3790,7 @@
             if (content) content.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-muted);">Loading incident details...</div>';
 
             try {
-                const token = localStorage.getItem('adminToken');
+                const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
                 const res = await fetch(`${API_URL}/admin/incidents/${incidentId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -3852,7 +3853,7 @@
 
         // --- VIEW 2: Police Force Operations ---
         async function fetchOfficers() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const tbody = document.getElementById('policeTableBody');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading commissioned police officers...</td></tr>';
@@ -3926,7 +3927,7 @@
 
         async function handleCommissionOfficerSubmit(e) {
             e.preventDefault();
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const btn = document.getElementById('commissionSubmitBtn');
             const err = document.getElementById('commissionError');
             if (btn) { btn.innerText = "Commissioning..."; btn.disabled = true; }
@@ -3969,7 +3970,7 @@
         }
 
         async function toggleOfficerStatus(officerId, newStatus) {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             try {
                 const res = await fetch(`${API_URL}/admin/officers/${officerId}/status`, {
                     method: 'PUT',
@@ -3994,7 +3995,7 @@
         }
 
         async function fetchCrimeReports() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const tbody = document.getElementById('crimeTableBody');
             if (!tbody) return;
 
@@ -4048,7 +4049,7 @@
         }
 
         async function toggleCrimeVerification(incidentId, newVerified) {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             try {
                 const res = await fetch(`${API_URL}/admin/crime-reports/${incidentId}/verify`, {
                     method: 'PUT',
@@ -4073,7 +4074,7 @@
 
         // --- VIEW 4: Safety Advisories & Patrol Recommendations ---
         async function fetchSafetyAdvisories() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const tbody = document.getElementById('advisoriesTableBody');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading safety advisories...</td></tr>';
@@ -4135,7 +4136,7 @@
 
         async function handleBroadcastAdvisorySubmit(e) {
             e.preventDefault();
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const btn = document.getElementById('broadcastSubmitBtn');
             const err = document.getElementById('advisoryError');
             if (btn) { btn.innerText = "Broadcasting..."; btn.disabled = true; }
@@ -4175,7 +4176,7 @@
         }
 
         async function toggleAdvisoryStatus(advisoryId) {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             try {
                 const res = await fetch(`${API_URL}/admin/advisories/${advisoryId}/toggle`, {
                     method: 'PUT',
@@ -4191,7 +4192,7 @@
 
         async function deleteAdvisory(advisoryId) {
             if (!confirm("Delete this safety advisory permanently?")) return;
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             try {
                 const res = await fetch(`${API_URL}/admin/advisories/${advisoryId}`, {
                     method: 'DELETE',
@@ -4206,7 +4207,7 @@
         }
 
         async function fetchPatrolRecommendations() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const container = document.getElementById('patrolRecommendationsList');
             if (!container) return;
             container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading recommendations...</div>';
@@ -4270,7 +4271,7 @@
 
         async function executeApprovePatrol() {
             if (!pendingApprovePatrolId) return;
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const btn = document.getElementById('confirmApprovePatrolBtn');
             const err = document.getElementById('approvePatrolError');
             if (btn) { btn.innerText = "Deploying..."; btn.disabled = true; }
@@ -4304,7 +4305,7 @@
 
         // --- VIEW 5: Citizen Directory Operations ---
         async function fetchUsers() {
-            const token = localStorage.getItem('adminToken');
+            const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
             const tbody = document.getElementById('usersTableBody');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading registered citizens...</td></tr>';
@@ -4349,7 +4350,7 @@
             if (content) content.innerHTML = '<div style="text-align:center;padding:2.5rem;color:var(--text-muted);">Loading user profile...</div>';
             
             try {
-                const token = localStorage.getItem('adminToken');
+                const token = localStorage.getItem('adminToken') || localStorage.getItem('policeToken');
                 const res = await fetch(`${API_URL}/admin/users/${userId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

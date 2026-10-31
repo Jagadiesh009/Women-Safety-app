@@ -207,6 +207,21 @@ class PatrolUnitMarker(BaseModel):
     updated_at: datetime
     is_self: bool = False
 
+class NearbyPoliceOfficerResponse(BaseModel):
+    officer_id: int
+    display_name: str
+    badge_number: str
+    rank: str
+    station_name: str
+    latitude: float
+    longitude: float
+    distance_km: float
+    duty_status: str # "ON DUTY"
+    last_location_update: datetime
+
+    class Config:
+        from_attributes = True
+
 class IncomingAlertItem(BaseModel):
     incident_id: int
     notification_id: int
