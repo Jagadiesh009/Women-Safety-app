@@ -10,17 +10,16 @@ A production-quality MVP for a women's safety platform built using AI, IoT, and 
 
 This project prioritises reliability, security, and core SOS functionality over mock AI features.
 
-## 👥 Authors and Contributors
+## Authors and Contributors
 
 **Project Contributors**
 
 - [Jagadiesh009](https://github.com/Jagadiesh009) — GitHub Profile
-- [jagadiesh7003](https://github.com/jagadiesh7003) — GitHub Profile
 - [Bhagyaashreee](https://github.com/Bhagyaashreee) — GitHub Profile
 
 **Repository:** [Jagadiesh009/Women-Safety-app](https://github.com/Jagadiesh009/Women-Safety-app)
 
-## 📖 Project Overview
+##  Project Overview
 
 Personal safety emergencies demand fast, dependable communication. Delays in alerting trusted contacts or authorities, unreliable location sharing, and a lack of verifiable evidence can all reduce the effectiveness of a response.
 
@@ -50,7 +49,7 @@ This project implements a complete safety platform in which a user can trigger a
 - Dockerised infrastructure for PostgreSQL and Redis.
 - Secure authentication using bcrypt and JWT.
 
-## 🏗️ System Architecture
+## System Architecture
 
 The system follows a layered architecture, with each component responsible for a distinct part of the platform.
 
@@ -82,7 +81,7 @@ The system follows a layered architecture, with each component responsible for a
 └─────────────────────────────────────────────┘
 ```
 
-## ⚙️ System Components
+## System Components
 
 The platform is organised into three main parts.
 
@@ -115,7 +114,7 @@ PostgreSQL stores persistent data, Redis supports caching and real-time WebSocke
 
 A dedicated web dashboard for administrators to monitor incidents and respond to emergencies. The repository records a production deployment named `safeher-admin-dashboard`.
 
-## 🛠️ Technologies and Requirements
+##  Technologies and Requirements
 
 | Component | Technology |
 |---|---|
@@ -141,7 +140,7 @@ A dedicated web dashboard for administrators to monitor incidents and respond to
 | CSS | 0.7% |
 | Kotlin | 0.1% |
 
-## 📁 Repository Directory Structure
+##  Repository Directory Structure
 
 ```text
 Women-Safety-app/
@@ -165,7 +164,7 @@ Women-Safety-app/
 | `frontend/mobile/` | Flutter mobile application |
 | `docs/` | Technical documentation |
 
-## 🚀 How to Run the Project
+##  How to Run the Project
 
 ### Prerequisites
 
@@ -220,7 +219,7 @@ flutter pub get
 flutter run
 ```
 
-## 🔐 Security and Privacy Model
+## Security and Privacy Model
 
 - Passwords are hashed using **bcrypt**.
 - **JWT** tokens are used for authentication.
@@ -228,11 +227,11 @@ flutter run
 - No dummy or mocked data is presented as real statistics.
 - Secrets are kept in environment variables and are never committed (`.env` is git-ignored).
 
-## 🧠 AI Risk Scoring
+##  AI Risk Scoring
 
 A Scikit-learn model is used for risk scoring. The project deliberately favours dependable SOS functionality over decorative AI features, so risk scores should be treated as a supporting signal and not as a replacement for emergency response.
 
-## 🎯 Applications
+## Applications
 
 - Personal safety and emergency alerting.
 - Live location sharing during incidents.
@@ -240,7 +239,7 @@ A Scikit-learn model is used for risk scoring. The project deliberately favours 
 - Administrative monitoring of safety incidents.
 - Academic and research demonstrations of AI, IoT, and cloud-based safety systems.
 
-## ⚠️ Limitations
+## Limitations
 
 - The application depends on network connectivity and GPS availability.
 - Location accuracy depends on the user's device and environment.
@@ -249,7 +248,7 @@ A Scikit-learn model is used for risk scoring. The project deliberately favours 
 - This is an MVP and should undergo security review and load testing before large-scale deployment.
 - It is not a replacement for official emergency services.
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - Integration with dedicated IoT wearable devices.
 - Direct integration with local emergency services.
@@ -258,7 +257,7 @@ A Scikit-learn model is used for risk scoring. The project deliberately favours 
 - Expanded analytics in the admin dashboard.
 - Automated testing and CI/CD pipelines.
 
-## 📚 References and Technical Background
+## References and Technical Background
 
 The project uses established concepts and technologies from:
 
